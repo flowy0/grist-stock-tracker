@@ -119,7 +119,7 @@ class CSVImporter:
         logger.info(f"Loaded {len(df)} rows from CSV")
         return df
 
-    def transform_to_bronze(self, df: pd.DataFrame, source_file: str) -> list:
+    def transform_to_bronze(self, df: pd.DataFrame, source_file: str, source: str = "moomoo") -> list:
         """Transform DataFrame to bronze_transactions format."""
         records = []
         import_date = datetime.now().isoformat()
@@ -161,7 +161,7 @@ class CSVImporter:
                 "CAT_Fees": self._parse_numeric(row.get("Consolidated Audit Trail Fees")),
                 "Commission": self._parse_numeric(row.get("Commission")),
                 "Clearing_Fees": self._parse_numeric(row.get("Clearing Fees")),
-                "Platform": "moomoo",
+                "Platform": source,
                 "Validation_Status": "Pending",
                 "Validation_Errors": "",
             }
@@ -189,7 +189,7 @@ class CSVImporter:
         except (ValueError, TypeError):
             return str(value)
 
-    def import_csv(self, file_path: str, dry_run: bool = False) -> int:
+    def import_csv(self, file_path: str, dry_run: bool = False, source: str = "moomoo") -> int:
         """Import CSV file into bronze_transactions table."""
         # Read CSV
         df = self.read_csv(file_path)
@@ -200,7 +200,7 @@ class CSVImporter:
 
         # Transform to bronze format
         source_file = Path(file_path).name
-        records = self.transform_to_bronze(df, source_file)
+        records = self.transform_to_bronze(df, source_file, source)
         logger.info(f"Transformed {len(records)} records for bronze layer")
 
         if dry_run:
@@ -232,6 +232,7 @@ Examples:
     uv run python csv_import_helper.py samples/sample-singapore-stocks.csv --dry-run
     uv run python csv_import_helper.py samples/test.csv --env test
     uv run python csv_import_helper.py samples/data.csv --doc-id mydoc --api-key mykey
+    uv run python csv_import_helper.py samples/data.csv --source ibkr
         """,
     )
     parser.add_argument("csv_file", help="Path to moomoo CSV export file")
@@ -256,6 +257,11 @@ Examples:
         "--dry-run",
         action="store_true",
         help="Show what would be imported without actually importing",
+    )
+    parser.add_argument(
+        "--source",
+        default="moomoo",
+        help="Source platform (default: moomoo)",
     )
 
     args = parser.parse_args()
@@ -295,7 +301,7 @@ Examples:
         importer = CSVImporter(grist_api)
         
         # Import CSV
-        count = importer.import_csv(args.csv_file, dry_run=args.dry_run)
+        count = importer.import_csv(args.csv_file, dry_run=args.dry_run, source=args.source)
         
         if args.dry_run:
             logger.info(f"Dry run complete. Would import {count} records.")
