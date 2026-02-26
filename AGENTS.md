@@ -840,10 +840,10 @@ curl -X POST \
 
 ### Automated Table Setup Script
 
-The `scripts/setup_grist_tables.py` script automates table creation via the Grist API:
+The `scripts/setup_grist_tables.py` script automates table and formula creation via the Grist API:
 
 ```bash
-# Setup all tables in dev environment
+# Setup all tables and formulas in dev environment
 uv run python setup_grist_tables.py --env dev
 
 # Preview what would be created (dry run)
@@ -855,30 +855,33 @@ uv run python setup_grist_tables.py --env dev --list-tables
 
 **What the script creates:**
 
-| Table | Layer | Columns |
-|-------|-------|---------|
-| `bronze_transactions` | Bronze | 30 columns (raw CSV data) |
-| `silver_stocks` | Silver | 9 columns (stock master data) |
-| `silver_transactions` | Silver | 20 columns (validated transactions) |
-| `gold_positions` | Gold | 10 columns (position calculations) |
-| `gold_stocks` | Gold | 14 columns (portfolio view) |
-| `gold_monthly_archive` | Gold | 11 columns (historical snapshots) |
+| Table | Layer | Columns | Formulas |
+|-------|-------|---------|----------|
+| `bronze_transactions` | Bronze | 30 | 0 |
+| `silver_stocks` | Silver | 9 | 0 |
+| `silver_transactions` | Silver | 20 | 2 (Total_Fees, Net_Amount) |
+| `gold_positions` | Gold | 10 | 8 (all calculated fields) |
+| `gold_stocks` | Gold | 14 | 13 (mostly lookups) |
+| `gold_monthly_archive` | Gold | 11 | 0 |
 
-**Limitations:**
-- Creates basic column types (Text, Numeric, Choice, Toggle, DateTime)
-- **Formulas must be added manually** via Grist UI (see `docs/03-grist-table-setup.md`)
-- References between tables must be configured manually
+**Formulas created automatically:**
 
-**Recommended workflow:**
-1. Run the automation script to create tables and columns
-2. Manually add formulas using the guide in `docs/03-grist-table-setup.md`
-3. Configure any special formatting or conditional styles
+- `silver_transactions.Total_Fees` - Sum of all fee types
+- `silver_transactions.Net_Amount` - Fill amount +/- fees based on side
+- `gold_positions` - All fields (Total_Shares, Total_Invested, Avg_Cost_Basis, Market_Value, P/L, Return %, Days_Held)
+- `gold_stocks` - All lookup and calculated fields
+
+**Notes:**
+- ✅ Tables, columns, and formulas are all created via API
+- ✅ Choice columns have predefined values (Buy/Sell/Dividend, SG/US/HK/UK, etc.)
+- ⏳ References between tables must be configured manually (Grist UI)
+- ⏳ Conditional formatting and advanced options require manual setup
 
 ### Current Implementation Status
 
 - ✅ **Manual setup documented** in `docs/03-grist-table-setup.md`
-- ✅ **API automation script** - `scripts/setup_grist_tables.py` creates all tables and columns
-- ⏳ **Formula automation** - Formulas must still be added manually via Grist UI
+- ✅ **API automation script** - `scripts/setup_grist_tables.py` creates tables, columns, and formulas
+- ⏳ **Table references** - Must be configured manually via Grist UI (References not yet supported via API)
 
 ## Testing Strategy
 

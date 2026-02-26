@@ -219,12 +219,12 @@ uv run python bronze_to_silver.py
 
 #### Option A: Automated Setup (Recommended)
 
-Use the automation script to create all tables via the Grist API:
+Use the automation script to create all tables, columns, and formulas via the Grist API:
 
 ```bash
 cd scripts
 
-# Create all tables in dev environment
+# Create all tables and formulas in dev environment
 uv run python setup_grist_tables.py --env dev
 
 # Preview what will be created
@@ -234,9 +234,29 @@ uv run python setup_grist_tables.py --env dev --dry-run
 uv run python setup_grist_tables.py --env dev --list-tables
 ```
 
+**What gets created:**
+- ✅ All 6 tables (bronze, silver, gold layers)
+- ✅ All columns with proper types
+- ✅ Choice columns with predefined values
+- ✅ Formulas for calculated fields (Total_Fees, Net_Amount, P/L, etc.)
+
 **After automation:**
 1. Log into Grist and verify tables were created
-2. Manually add formulas (see Option B step 3)
+2. Configure table references manually (see below)
+
+#### Configure Table References
+
+After running the automation script, you need to configure references between tables:
+
+1. **silver_transactions.Symbol** → Reference to `silver_stocks.Symbol`
+2. **gold_positions.Symbol** → Reference to `silver_stocks.Symbol`  
+3. **gold_stocks.Symbol** → Reference to `silver_stocks.Symbol`
+
+To set a reference:
+1. Open the table in Grist
+2. Click the column header → "Column Options"
+3. Change type to "Reference"
+4. Select "Table: silver_stocks" and "Column: Symbol"
 
 #### Option B: Manual Setup
 

@@ -120,8 +120,10 @@ SILVER_TRANSACTIONS_SCHEMA = {
         {"id": "CAT_Fees", "label": "CAT Fees", "type": "Numeric"},
         {"id": "Commission", "label": "Commission", "type": "Numeric"},
         {"id": "Clearing_Fees", "label": "Clearing Fees", "type": "Numeric"},
-        {"id": "Total_Fees", "label": "Total Fees", "type": "Numeric"},  # Will be formula
-        {"id": "Net_Amount", "label": "Net Amount", "type": "Numeric"},  # Will be formula
+        {"id": "Total_Fees", "label": "Total Fees", "type": "Formula", 
+         "formula": "sum([$Platform_Fees or 0, $Tax or 0, $Settlement_Fees or 0, $Trading_Fees or 0, $CAT_Fees or 0, $Commission or 0, $Clearing_Fees or 0])"},
+        {"id": "Net_Amount", "label": "Net Amount", "type": "Formula", 
+         "formula": "$Fill_Amount + $Total_Fees if $Side == \"Buy\" else $Fill_Amount - $Total_Fees"},
         {"id": "Platform", "label": "Platform", "type": "Text"},
         {"id": "Notes", "label": "Notes", "type": "Text"},
     ]
@@ -133,14 +135,22 @@ GOLD_POSITIONS_SCHEMA = {
     "columns": [
         {"id": "Position_ID", "label": "Position ID", "type": "Text"},
         {"id": "Symbol", "label": "Symbol", "type": "Text"},  # Reference to silver_stocks
-        {"id": "Total_Shares", "label": "Total Shares", "type": "Numeric"},
-        {"id": "Total_Invested", "label": "Total Invested", "type": "Numeric"},
-        {"id": "Avg_Cost_Basis", "label": "Avg Cost Basis", "type": "Numeric"},
-        {"id": "Current_Market_Value", "label": "Current Market Value", "type": "Numeric"},
-        {"id": "Unrealized_P_L", "label": "Unrealized P/L", "type": "Numeric"},
-        {"id": "Realized_P_L", "label": "Realized P/L", "type": "Numeric"},
-        {"id": "Return_Pct", "label": "Return %", "type": "Numeric"},
-        {"id": "Days_Held", "label": "Days Held", "type": "Numeric"},
+        {"id": "Total_Shares", "label": "Total Shares", "type": "Formula", 
+         "formula": "import itertools\ntxns = silver_transactions.lookupRecords(Symbol=$Symbol)\nreturn sum(t.Fill_Qty if t.Side==\"Buy\" else -t.Fill_Qty for t in txns if t.Side!=\"Dividend\")"},
+        {"id": "Total_Invested", "label": "Total Invested", "type": "Formula", 
+         "formula": "txns = silver_transactions.lookupRecords(Symbol=$Symbol, Side=\"Buy\")\nreturn sum(t.Net_Amount for t in txns)"},
+        {"id": "Avg_Cost_Basis", "label": "Avg Cost Basis", "type": "Formula", 
+         "formula": "$Total_Invested / $Total_Shares if $Total_Shares > 0 else 0"},
+        {"id": "Current_Market_Value", "label": "Current Market Value", "type": "Formula", 
+         "formula": "$Total_Shares * silver_stocks.lookupOne(Symbol=$Symbol).Current_Price if $Total_Shares > 0 else 0"},
+        {"id": "Unrealized_P_L", "label": "Unrealized P/L", "type": "Formula", 
+         "formula": "$Current_Market_Value - $Total_Invested if $Total_Shares > 0 else 0"},
+        {"id": "Realized_P_L", "label": "Realized P/L", "type": "Formula", 
+         "formula": "txns = silver_transactions.lookupRecords(Symbol=$Symbol, Side=\"Sell\")\ncost_basis = $Avg_Cost_Basis\nreturn sum(t.Fill_Amount - (t.Fill_Qty * cost_basis) for t in txns)"},
+        {"id": "Return_Pct", "label": "Return %", "type": "Formula", 
+         "formula": "($Unrealized_P_L + $Realized_P_L) / $Total_Invested * 100 if $Total_Invested > 0 else 0"},
+        {"id": "Days_Held", "label": "Days Held", "type": "Formula", 
+         "formula": "import datetime\ntxns = silver_transactions.lookupRecords(Symbol=$Symbol, Side=\"Buy\")\nif len(txns) > 0:\n    first_date = min(t.Date for t in txns if t.Date)\n    return (datetime.datetime.now() - first_date).days\nreturn 0"},
     ]
 }
 
@@ -149,19 +159,32 @@ GOLD_STOCKS_SCHEMA = {
     "id": "gold_stocks",
     "columns": [
         {"id": "Symbol", "label": "Symbol", "type": "Text"},  # Reference to silver_stocks
-        {"id": "Name", "label": "Name", "type": "Text"},
-        {"id": "Market", "label": "Market", "type": "Text"},
-        {"id": "Currency", "label": "Currency", "type": "Text"},
-        {"id": "Asset_Type", "label": "Asset Type", "type": "Text"},
-        {"id": "Current_Price", "label": "Current Price", "type": "Numeric"},
-        {"id": "Total_Shares", "label": "Total Shares", "type": "Numeric"},
-        {"id": "Total_Invested", "label": "Total Invested", "type": "Numeric"},
-        {"id": "Avg_Cost_Basis", "label": "Avg Cost Basis", "type": "Numeric"},
-        {"id": "Current_Market_Value", "label": "Current Market Value", "type": "Numeric"},
-        {"id": "Unrealized_P_L", "label": "Unrealized P/L", "type": "Numeric"},
-        {"id": "Realized_P_L", "label": "Realized P/L", "type": "Numeric"},
-        {"id": "Total_Return_Pct", "label": "Total Return %", "type": "Numeric"},
-        {"id": "Last_Transaction_Date", "label": "Last Transaction Date", "type": "DateTime"},
+        {"id": "Name", "label": "Name", "type": "Formula", 
+         "formula": "silver_stocks.lookupOne(Symbol=$Symbol).Name"},
+        {"id": "Market", "label": "Market", "type": "Formula", 
+         "formula": "silver_stocks.lookupOne(Symbol=$Symbol).Market"},
+        {"id": "Currency", "label": "Currency", "type": "Formula", 
+         "formula": "silver_stocks.lookupOne(Symbol=$Symbol).Currency"},
+        {"id": "Asset_Type", "label": "Asset Type", "type": "Formula", 
+         "formula": "silver_stocks.lookupOne(Symbol=$Symbol).Asset_Type"},
+        {"id": "Current_Price", "label": "Current Price", "type": "Formula", 
+         "formula": "silver_stocks.lookupOne(Symbol=$Symbol).Current_Price"},
+        {"id": "Total_Shares", "label": "Total Shares", "type": "Formula", 
+         "formula": "gold_positions.lookupOne(Symbol=$Symbol).Total_Shares"},
+        {"id": "Total_Invested", "label": "Total Invested", "type": "Formula", 
+         "formula": "gold_positions.lookupOne(Symbol=$Symbol).Total_Invested"},
+        {"id": "Avg_Cost_Basis", "label": "Avg Cost Basis", "type": "Formula", 
+         "formula": "gold_positions.lookupOne(Symbol=$Symbol).Avg_Cost_Basis"},
+        {"id": "Current_Market_Value", "label": "Current Market Value", "type": "Formula", 
+         "formula": "gold_positions.lookupOne(Symbol=$Symbol).Current_Market_Value"},
+        {"id": "Unrealized_P_L", "label": "Unrealized P/L", "type": "Formula", 
+         "formula": "gold_positions.lookupOne(Symbol=$Symbol).Unrealized_P_L"},
+        {"id": "Realized_P_L", "label": "Realized P/L", "type": "Formula", 
+         "formula": "gold_positions.lookupOne(Symbol=$Symbol).Realized_P_L"},
+        {"id": "Total_Return_Pct", "label": "Total Return %", "type": "Formula", 
+         "formula": "($Unrealized_P_L + $Realized_P_L) / $Total_Invested * 100 if $Total_Invested > 0 else 0"},
+        {"id": "Last_Transaction_Date", "label": "Last Transaction Date", "type": "Formula", 
+         "formula": "txns = silver_transactions.lookupRecords(Symbol=$Symbol)\nif len(txns) > 0:\n    return max(t.Date for t in txns if t.Date)\nreturn None"},
     ]
 }
 
@@ -268,6 +291,10 @@ class GristSetupClient:
                     "choiceOptions": {c: {"backColor": "#FFFFFF", "textColor": "#000000"} 
                                       for c in col["choices"]}
                 })
+            # Add formula for Formula type
+            if col["type"] == "Formula" and "formula" in col:
+                col_def["fields"]["isFormula"] = True
+                col_def["fields"]["formula"] = col["formula"]
             api_columns.append(col_def)
 
         payload = {
