@@ -494,6 +494,18 @@ Copy `.env.example` to `docker/.env` and configure:
 
 ## Development Conventions
 
+### Working Directory
+
+The project working directory is preset to:
+```
+/Users/g/Library/CloudStorage/Dropbox/Code/grist-stock-tracker
+```
+
+All commands run from this directory. No `cd` needed:
+- ✅ `git status`
+- ✅ `ls samples/`
+- ✅ `docker-compose up -d`
+
 ### Code Organization
 
 - **scripts/**: Python automation scripts (CSV import, price updates)
