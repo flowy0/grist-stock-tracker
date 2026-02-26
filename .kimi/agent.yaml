@@ -33,6 +33,12 @@ agent:
     # - "kimi_cli.tools.web:FetchURL"          # Block URL fetching
     # - "kimi_cli.tools.multiagent:Task"       # Block subagent spawning
 
+  # SECURITY NOTE: File Access Restriction
+  # This agent is configured to only work within the project directory.
+  # The system prompt explicitly forbids accessing files outside ${KIMI_WORK_DIR}.
+  # However, the AI can still technically access files outside with absolute paths.
+  # User approval is required for all file write operations as an additional safeguard.
+
   # Subagents for specialized tasks (optional)
   subagents:
     # Code reviewer subagent - focused on Python code review

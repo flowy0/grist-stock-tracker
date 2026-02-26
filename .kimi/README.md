@@ -72,7 +72,28 @@ This developer agent has access to:
 
 ## Security Notes
 
-1. **Approvals Required**: All file writes and shell commands still require user approval (unless in YOLO mode)
+### File Access Restriction
+
+This agent is configured to **only access files within the project directory** (`${KIMI_WORK_DIR}`).
+
+**Enforced via system prompt:**
+- ✅ Allowed: Relative paths like `scripts/file.py`, `samples/data.csv`
+- ❌ Forbidden: Absolute paths outside working directory
+- ❌ Forbidden: Parent directory traversal like `../`
+
+**Important Limitations:**
+1. Kimi Code does not have a technical enforcement mechanism to block file access outside the working directory
+2. The AI can still technically access files with absolute paths (e.g., `/Users/other/file.txt`)
+3. **User approval is the safeguard** - you will be prompted to approve any file operation
+
+**Best Practices:**
+- Always review the file path before approving write operations
+- If the AI suggests accessing files outside the project, deny the operation
+- Copy any needed external files into the project directory first
+
+### Other Security Measures
+
+1. **Approvals Required**: All file writes and shell commands require user approval (unless in YOLO mode)
 
 2. **Subagents are Sandboxed**: Subagents run in isolated contexts and cannot spawn other subagents
 
