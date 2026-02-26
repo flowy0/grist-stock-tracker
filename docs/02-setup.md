@@ -91,9 +91,11 @@ Grist will be available at: http://localhost:8484
 1. Open http://localhost:8484
 2. Complete initial setup (create admin user)
 3. Create a new document called "Stock Tracker"
-4. Generate API key: Profile → Settings → API Key
-5. Add API key to `.env`:
+4. **Get your Document ID** from the URL: `http://localhost:8484/o/docs/doc/{DOC-ID}/...`
+5. **Generate API key**: Profile → Settings → API Key → Create Key
+6. **Add to `.env`:**
    ```bash
+   echo "GRIST_DOC_ID=your-doc-id-here" >> .env
    echo "GRIST_API_KEY=your-api-key-here" >> .env
    ```
 
@@ -219,44 +221,98 @@ uv run python bronze_to_silver.py
 
 #### Option A: Automated Setup (Recommended)
 
-Use the automation script to create all tables, columns, and formulas via the Grist API:
+Use the automation script to create all tables, columns, and formulas via the Grist API.
+
+##### Prerequisites
+
+1. Grist must be running (see Step 4 above)
+2. You must have created a document in Grist and have the Doc ID
+3. Your API key must be configured in `.env`
+
+##### Step 1: Get Your Document ID and API Key
+
+1. Open Grist at http://localhost:8484
+2. Create a new document (or open existing one)
+3. Copy the Doc ID from the URL: `http://localhost:8484/o/docs/doc/{DOC-ID}/...`
+4. Get your API Key: Profile → API Keys → Create Key
+5. Add to your `.env` file:
+   ```bash
+   GRIST_DOC_ID=your_doc_id_here
+   GRIST_API_KEY=your_api_key_here
+   ```
+
+##### Step 2: Run the Automation Script
 
 ```bash
 cd scripts
 
-# Create all tables and formulas in dev environment
-uv run python setup_grist_tables.py --env dev
-
-# Preview what will be created
+# Preview what will be created (dry run - no changes made)
 uv run python setup_grist_tables.py --env dev --dry-run
 
-# Check existing tables
-uv run python setup_grist_tables.py --env dev --list-tables
+# Create all tables, columns, and formulas
+uv run python setup_grist_tables.py --env dev
 ```
 
-**What gets created:**
-- ✅ All 6 tables (bronze, silver, gold layers)
-- ✅ All columns with proper types
-- ✅ Choice columns with predefined values
-- ✅ Formulas for calculated fields (Total_Fees, Net_Amount, P/L, etc.)
+**Expected output:**
+```
+INFO - Setting up Grist Tables - Medallion Architecture
+INFO - 📋 Processing table: bronze_transactions
+INFO - ✅ Created table 'bronze_transactions' with 30 columns
+INFO - 📋 Processing table: silver_stocks
+INFO - ✅ Created table 'silver_stocks' with 9 columns
+...
+INFO - Setup Summary
+INFO - ✅ Created: bronze_transactions
+INFO - ✅ Created: silver_stocks
+...
+INFO - ✨ Setup complete!
+```
 
-**After automation:**
-1. Log into Grist and verify tables were created
-2. Configure table references manually (see below)
+##### Step 3: Verify Tables Were Created
 
-#### Configure Table References
+1. Open Grist at http://localhost:8484
+2. Open your document
+3. Check that all tables appear in the left sidebar:
+   - `bronze_transactions`
+   - `silver_stocks`
+   - `silver_transactions`
+   - `gold_positions`
+   - `gold_stocks`
+   - `gold_monthly_archive`
 
-After running the automation script, you need to configure references between tables:
+##### Step 4: Configure Table References
 
-1. **silver_transactions.Symbol** → Reference to `silver_stocks.Symbol`
-2. **gold_positions.Symbol** → Reference to `silver_stocks.Symbol`  
-3. **gold_stocks.Symbol** → Reference to `silver_stocks.Symbol`
+The automation script creates tables and formulas, but **table references must be configured manually**:
 
-To set a reference:
+| Column | Should Reference |
+|--------|------------------|
+| `silver_transactions.Symbol` | `silver_stocks.Symbol` |
+| `gold_positions.Symbol` | `silver_stocks.Symbol` |
+| `gold_stocks.Symbol` | `silver_stocks.Symbol` |
+
+**To set a reference:**
 1. Open the table in Grist
-2. Click the column header → "Column Options"
-3. Change type to "Reference"
-4. Select "Table: silver_stocks" and "Column: Symbol"
+2. Click the column header (e.g., "Symbol") → "Column Options"
+3. Change "Column Type" to "Reference"
+4. Set "Table" to `silver_stocks`
+5. Set "Column" to `Symbol`
+6. Click "Apply"
+
+##### Troubleshooting
+
+**"Table already exists" messages:**
+- This is normal if you run the script multiple times
+- The script skips existing tables (idempotent)
+
+**API errors:**
+- Check that Grist is running: `docker compose ps`
+- Verify your API key and Doc ID in `.env`
+- Try with explicit values: `uv run python setup_grist_tables.py --doc-id <id> --api-key <key>`
+
+**Formulas not working:**
+- Ensure table references are configured (Step 4 above)
+- Check that referenced tables exist
+- Formulas referencing other tables need references set up first
 
 #### Option B: Manual Setup
 
