@@ -13,13 +13,14 @@ It performs:
 5. Validation status updates in Bronze layer
 
 Usage:
-    uv run python bronze_to_silver.py [--doc-id <id>] [--api-key <key>]
+    uv run python bronze_to_silver.py [--env <env>]
     uv run python bronze_to_silver.py --dry-run
+    uv run python bronze_to_silver.py --env test
 
 Environment Variables:
-    GRIST_DOC_ID: Grist document ID
-    GRIST_API_KEY: Grist API key
-    GRIST_API_URL: Grist API URL (default: http://localhost:8484/api)
+    ENVIRONMENT: Current environment (dev | test | production)
+    GRIST_API_KEY / TEST_GRIST_API_KEY / PROD_GRIST_API_KEY
+    GRIST_DOC_ID / TEST_GRIST_DOC_ID / PROD_GRIST_DOC_ID
 """
 
 import argparse
@@ -31,11 +32,11 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from dotenv import load_dotenv
-
 from csv_import_helper import GristAPI
+from config import Config, get_config
 
 # Load environment variables
+from dotenv import load_dotenv
 load_dotenv()
 
 # Configure logging
@@ -338,23 +339,26 @@ def main():
 Examples:
     uv run python bronze_to_silver.py
     uv run python bronze_to_silver.py --dry-run
+    uv run python bronze_to_silver.py --env test
     uv run python bronze_to_silver.py --doc-id mydoc --api-key mykey
         """,
     )
     parser.add_argument(
+        "--env",
+        choices=["dev", "test", "production"],
+        help="Environment to use (overrides ENVIRONMENT variable)",
+    )
+    parser.add_argument(
         "--doc-id",
-        default=os.getenv("GRIST_DOC_ID"),
-        help="Grist document ID (or set GRIST_DOC_ID env var)",
+        help="Grist document ID (overrides environment config)",
     )
     parser.add_argument(
         "--api-key",
-        default=os.getenv("GRIST_API_KEY"),
-        help="Grist API key (or set GRIST_API_KEY env var)",
+        help="Grist API key (overrides environment config)",
     )
     parser.add_argument(
         "--api-url",
-        default=os.getenv("GRIST_API_URL", "http://localhost:8484/api"),
-        help="Grist API URL (default: http://localhost:8484/api)",
+        help="Grist API URL (overrides environment config)",
     )
     parser.add_argument(
         "--dry-run",
@@ -364,18 +368,36 @@ Examples:
 
     args = parser.parse_args()
 
+    # Get configuration
+    config = get_config(args.env)
+    api_url = args.api_url or f"{config.url}/api"
+    api_key = args.api_key or config.api_key
+    doc_id = args.doc_id or config.doc_id
+
     # Validate required arguments
-    if not args.doc_id:
-        logger.error("Grist document ID is required. Set GRIST_DOC_ID or use --doc-id")
+    if not doc_id:
+        logger.error(
+            "Grist document ID is required. "
+            "Set GRIST_DOC_ID / TEST_GRIST_DOC_ID / PROD_GRIST_DOC_ID "
+            "or use --doc-id"
+        )
         sys.exit(1)
 
-    if not args.api_key:
-        logger.error("Grist API key is required. Set GRIST_API_KEY or use --api-key")
+    if not api_key:
+        logger.error(
+            "Grist API key is required. "
+            "Set GRIST_API_KEY / TEST_GRIST_API_KEY / PROD_GRIST_API_KEY "
+            "or use --api-key"
+        )
         sys.exit(1)
+
+    env_display = args.env or Config.ENVIRONMENT
+    logger.info(f"Using environment: {env_display}")
+    logger.info(f"Grist URL: {config.url}")
 
     # Initialize and run transformer
     try:
-        grist_api = GristAPI(args.api_url, args.api_key, args.doc_id)
+        grist_api = GristAPI(api_url, api_key, doc_id)
         transformer = BronzeToSilverTransformer(grist_api)
         transformer.process_bronze_records(dry_run=args.dry_run)
     except Exception as e:
