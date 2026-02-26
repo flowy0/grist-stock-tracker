@@ -6,9 +6,10 @@ Fetches live stock prices from Yahoo Finance and updates silver_stocks table.
 Supports fallback to Alpha Vantage and Finnhub APIs.
 
 Usage:
-    uv run python price_updater.py [--env <env>]
-    uv run python price_updater.py --symbols AAPL,NVDA,TSLA --env dev
-    uv run python price_updater.py --all --env test
+    uv run python price_updater.py
+    uv run python price_updater.py --symbols AAPL,NVDA,TSLA
+    uv run python price_updater.py --all
+    uv run python price_updater.py --dry-run
 
 Environment Variables:
     ENVIRONMENT: Current environment (dev | test | production)
@@ -80,39 +81,35 @@ class YahooFinanceProvider:
         url = f"{self.BASE_URL}/{yahoo_symbol}"
         
         try:
-            response = self.session.get(url, params={"interval": "1d", "range": "1d"})
+            response = self.session.get(url, timeout=10)
             response.raise_for_status()
             data = response.json()
-
-            result = data.get("chart", {}).get("result", [])
-            if not result:
-                logger.warning(f"No data returned for {symbol} ({yahoo_symbol})")
-                return None
-
-            meta = result[0].get("meta", {})
+            
+            result = data.get("chart", {}).get("result", [{}])[0]
+            meta = result.get("meta", {})
+            
+            # Get current price
             price = meta.get("regularMarketPrice")
-            currency = meta.get("currency", "USD")
-            
-            # Get previous close for change calculation
             prev_close = meta.get("previousClose")
-            change = None
-            change_percent = None
             
-            if price and prev_close:
-                change = price - prev_close
-                change_percent = (change / prev_close) * 100
-
+            if price is None:
+                return None
+            
+            # Calculate change
+            change = price - prev_close if prev_close else 0
+            change_percent = (change / prev_close * 100) if prev_close else 0
+            
             return {
                 "price": price,
-                "currency": currency,
+                "currency": meta.get("currency", "USD"),
                 "change": change,
                 "change_percent": change_percent,
                 "timestamp": datetime.now().isoformat(),
                 "source": "Yahoo Finance",
             }
-
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to fetch price for {symbol}: {e}")
+            
+        except Exception as e:
+            logger.debug(f"Yahoo Finance error for {symbol}: {e}")
             return None
 
 
@@ -131,31 +128,31 @@ class AlphaVantageProvider:
             "symbol": symbol,
             "apikey": self.api_key,
         }
-
+        
         try:
-            response = requests.get(self.BASE_URL, params=params)
+            response = requests.get(self.BASE_URL, params=params, timeout=10)
             response.raise_for_status()
             data = response.json()
-
+            
             quote = data.get("Global Quote", {})
             if not quote:
                 return None
-
+            
             price = float(quote.get("05. price", 0))
             change = float(quote.get("09. change", 0))
             change_percent = float(quote.get("10. change percent", "0").replace("%", ""))
-
+            
             return {
                 "price": price,
-                "currency": "USD",  # Alpha Vantage mostly USD
+                "currency": "USD",  # Alpha Vantage typically returns USD
                 "change": change,
                 "change_percent": change_percent,
                 "timestamp": datetime.now().isoformat(),
                 "source": "Alpha Vantage",
             }
-
-        except (requests.exceptions.RequestException, ValueError) as e:
-            logger.error(f"Alpha Vantage error for {symbol}: {e}")
+            
+        except Exception as e:
+            logger.debug(f"Alpha Vantage error for {symbol}: {e}")
             return None
 
 
@@ -170,33 +167,36 @@ class FinnhubProvider:
     def get_price(self, symbol: str) -> Optional[dict]:
         """Get current price for a symbol."""
         url = f"{self.BASE_URL}/quote"
-        params = {"symbol": symbol, "token": self.api_key}
-
+        params = {
+            "symbol": symbol,
+            "token": self.api_key,
+        }
+        
         try:
-            response = requests.get(url, params=params)
+            response = requests.get(url, params=params, timeout=10)
             response.raise_for_status()
             data = response.json()
-
+            
             price = data.get("c")  # Current price
             prev_close = data.get("pc")  # Previous close
             
-            change = None
-            change_percent = None
-            if price and prev_close:
-                change = price - prev_close
-                change_percent = (change / prev_close) * 100
-
+            if price is None:
+                return None
+            
+            change = price - prev_close if prev_close else 0
+            change_percent = (change / prev_close * 100) if prev_close else 0
+            
             return {
                 "price": price,
-                "currency": "USD",  # Finnhub mostly USD
+                "currency": "USD",
                 "change": change,
                 "change_percent": change_percent,
                 "timestamp": datetime.now().isoformat(),
                 "source": "Finnhub",
             }
-
-        except (requests.exceptions.RequestException, TypeError) as e:
-            logger.error(f"Finnhub error for {symbol}: {e}")
+            
+        except Exception as e:
+            logger.debug(f"Finnhub error for {symbol}: {e}")
             return None
 
 
@@ -207,13 +207,13 @@ class PriceUpdater:
         self.grist_api = grist_api
         self.yahoo = YahooFinanceProvider()
         
-        # Initialize fallback providers if API keys available
+        # Initialize optional providers
         alphavantage_key = os.getenv("ALPHAVANTAGE_API_KEY")
         self.alphavantage = AlphaVantageProvider(alphavantage_key) if alphavantage_key else None
         
         finnhub_key = os.getenv("FINNHUB_API_KEY")
         self.finnhub = FinnhubProvider(finnhub_key) if finnhub_key else None
-
+        
         self.stats = {
             "processed": 0,
             "updated": 0,
@@ -248,7 +248,6 @@ class PriceUpdater:
                 "currency": fields.get("Currency", "USD"),
             })
 
-        logger.info(f"Found {len(stocks)} stocks to update")
         return stocks
 
     def fetch_price(self, symbol: str, market: str) -> Optional[dict]:
@@ -375,6 +374,11 @@ Examples:
         """,
     )
     parser.add_argument(
+        "--env",
+        choices=["dev", "test", "production"],
+        help="Environment to use (overrides ENVIRONMENT variable)",
+    )
+    parser.add_argument(
         "--symbols",
         help="Comma-separated list of symbols to update (default: all active)",
     )
@@ -385,18 +389,15 @@ Examples:
     )
     parser.add_argument(
         "--doc-id",
-        default=os.getenv("GRIST_DOC_ID"),
-        help="Grist document ID (or set GRIST_DOC_ID env var)",
+        help="Grist document ID (overrides environment config)",
     )
     parser.add_argument(
         "--api-key",
-        default=os.getenv("GRIST_API_KEY"),
-        help="Grist API key (or set GRIST_API_KEY env var)",
+        help="Grist API key (overrides environment config)",
     )
     parser.add_argument(
         "--api-url",
-        default=os.getenv("GRIST_API_URL", "http://localhost:8484/api"),
-        help="Grist API URL (default: http://localhost:8484/api)",
+        help="Grist API URL (overrides environment config)",
     )
     parser.add_argument(
         "--dry-run",
@@ -406,14 +407,32 @@ Examples:
 
     args = parser.parse_args()
 
+    # Get configuration from .env (ENVIRONMENT variable) or --env flag
+    config = get_config(args.env)
+    api_url = args.api_url or f"{config.url}/api"
+    api_key = args.api_key or config.api_key
+    doc_id = args.doc_id or config.doc_id
+
     # Validate required arguments
-    if not args.doc_id:
-        logger.error("Grist document ID is required. Set GRIST_DOC_ID or use --doc-id")
+    if not doc_id:
+        logger.error(
+            "Grist document ID is required. "
+            "Set GRIST_DOC_ID / TEST_GRIST_DOC_ID / PROD_GRIST_DOC_ID "
+            "or use --doc-id"
+        )
         sys.exit(1)
 
-    if not args.api_key:
-        logger.error("Grist API key is required. Set GRIST_API_KEY or use --api-key")
+    if not api_key:
+        logger.error(
+            "Grist API key is required. "
+            "Set GRIST_API_KEY / TEST_GRIST_API_KEY / PROD_GRIST_API_KEY "
+            "or use --api-key"
+        )
         sys.exit(1)
+
+    env_display = args.env or Config.ENVIRONMENT
+    logger.info(f"Using environment: {env_display}")
+    logger.info(f"Grist URL: {config.url}")
 
     # Parse symbols
     symbols = None

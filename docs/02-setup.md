@@ -160,17 +160,25 @@ grist-data/
 3. Each environment uses different Grist document IDs and API keys
 4. Data is isolated in separate directories
 
-**Example workflow:**
+**Recommended workflow - set once in `.env`:**
 ```bash
 # .env file
 ENVIRONMENT=dev
 GRIST_API_KEY=key_for_dev_doc
-TEST_GRIST_API_KEY=key_for_test_doc
+GRIST_DOC_ID=your_dev_doc_id
+```
 
-# This uses dev config (GRIST_API_KEY)
+Then run scripts without `--env`:
+```bash
+# These all use the dev environment automatically
 uv run python csv_import_helper.py data.csv
+uv run python bronze_to_silver.py
+uv run python price_updater.py --dry-run
+```
 
-# This uses test config (TEST_GRIST_API_KEY)  
+**Override temporarily with `--env`:**
+```bash
+# Use test environment just for this command
 uv run python csv_import_helper.py data.csv --env test
 ```
 
@@ -243,14 +251,19 @@ Use the automation script to create all tables, columns, and formulas via the Gr
 
 ##### Step 2: Run the Automation Script
 
+The scripts automatically use the `ENVIRONMENT` variable from your `.env` file. If you've set `ENVIRONMENT=dev` in `.env`, you don't need to specify `--env`.
+
 ```bash
 cd scripts
 
 # Preview what will be created (dry run - no changes made)
-uv run python setup_grist_tables.py --env dev --dry-run
+uv run python setup_grist_tables.py --dry-run
 
 # Create all tables, columns, and formulas
-uv run python setup_grist_tables.py --env dev
+uv run python setup_grist_tables.py
+
+# Or explicitly specify environment (overrides .env)
+uv run python setup_grist_tables.py --env test
 ```
 
 **Expected output:**

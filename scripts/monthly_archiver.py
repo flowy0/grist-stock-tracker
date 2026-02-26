@@ -283,6 +283,11 @@ Examples:
         """,
     )
     parser.add_argument(
+        "--env",
+        choices=["dev", "test", "production"],
+        help="Environment to use (overrides ENVIRONMENT variable)",
+    )
+    parser.add_argument(
         "--month",
         help="Month to archive (YYYY-MM format, default: previous month)",
     )
@@ -293,18 +298,15 @@ Examples:
     )
     parser.add_argument(
         "--doc-id",
-        default=os.getenv("GRIST_DOC_ID"),
-        help="Grist document ID (or set GRIST_DOC_ID env var)",
+        help="Grist document ID (overrides environment config)",
     )
     parser.add_argument(
         "--api-key",
-        default=os.getenv("GRIST_API_KEY"),
-        help="Grist API key (or set GRIST_API_KEY or use --api-key)",
+        help="Grist API key (overrides environment config)",
     )
     parser.add_argument(
         "--api-url",
-        default=os.getenv("GRIST_API_URL", "http://localhost:8484/api"),
-        help="Grist API URL (default: http://localhost:8484/api)",
+        help="Grist API URL (overrides environment config)",
     )
     parser.add_argument(
         "--dry-run",
@@ -314,14 +316,32 @@ Examples:
 
     args = parser.parse_args()
 
+    # Get configuration from .env (ENVIRONMENT variable) or --env flag
+    config = get_config(args.env)
+    api_url = args.api_url or f"{config.url}/api"
+    api_key = args.api_key or config.api_key
+    doc_id = args.doc_id or config.doc_id
+
     # Validate required arguments
-    if not args.doc_id:
-        logger.error("Grist document ID is required. Set GRIST_DOC_ID or use --doc-id")
+    if not doc_id:
+        logger.error(
+            "Grist document ID is required. "
+            "Set GRIST_DOC_ID / TEST_GRIST_DOC_ID / PROD_GRIST_DOC_ID "
+            "or use --doc-id"
+        )
         sys.exit(1)
 
-    if not args.api_key:
-        logger.error("Grist API key is required. Set GRIST_API_KEY or use --api-key")
+    if not api_key:
+        logger.error(
+            "Grist API key is required. "
+            "Set GRIST_API_KEY / TEST_GRIST_API_KEY / PROD_GRIST_API_KEY "
+            "or use --api-key"
+        )
         sys.exit(1)
+
+    env_display = args.env or Config.ENVIRONMENT
+    logger.info(f"Using environment: {env_display}")
+    logger.info(f"Grist URL: {config.url}")
 
     # Parse month
     year = None
