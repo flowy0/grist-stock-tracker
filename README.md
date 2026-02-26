@@ -21,6 +21,23 @@ A self-hosted stock portfolio tracking application built on Grist, featuring spr
 | `docs/implementation-todo.md` | Step-by-step implementation checklist |
 | `docs/sample-files-readme.md` | Documentation for sample CSV files |
 | `docs/01-project-spec.md` | Detailed project specification |
+| `.kimi/README.md` | Kimi Code agent configuration guide |
+
+## Development with Kimi Code
+
+This project includes a custom Kimi Code agent configuration for optimized development:
+
+```bash
+# Start Kimi with the project-specific developer agent
+kimi --agent-file .kimi/agent.yaml
+```
+
+### Available Subagents
+
+- **reviewer** - Python code review specialist
+- **tester** - Test generation specialist
+
+See `.kimi/README.md` for detailed configuration options.
 
 ## Sample Data
 
