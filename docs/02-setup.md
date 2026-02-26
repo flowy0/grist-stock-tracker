@@ -217,13 +217,56 @@ uv run python bronze_to_silver.py
 
 ### 8. Create Grist Tables
 
-Follow the table creation guide in `docs/03-grist-table-setup.md` to create:
+#### Option A: Automated Setup (Recommended)
+
+Use the automation script to create all tables via the Grist API:
+
+```bash
+cd scripts
+
+# Create all tables in dev environment
+uv run python setup_grist_tables.py --env dev
+
+# Preview what will be created
+uv run python setup_grist_tables.py --env dev --dry-run
+
+# Check existing tables
+uv run python setup_grist_tables.py --env dev --list-tables
+```
+
+**After automation:**
+1. Log into Grist and verify tables were created
+2. Manually add formulas (see Option B step 3)
+
+#### Option B: Manual Setup
+
+Follow the detailed guide in `docs/03-grist-table-setup.md` to create tables manually:
+
+**Tables to create:**
 - `bronze_transactions` - Raw CSV imports
-- `silver_stocks` - Stock master data
+- `silver_stocks` - Stock master data  
 - `silver_transactions` - Validated transactions
 - `gold_stocks` - Portfolio summary
 - `gold_positions` - Position calculations
 - `gold_monthly_archive` - Historical snapshots
+
+**Step 3: Add Formulas**
+
+After creating tables, add these key formulas:
+
+**`silver_transactions.Total_Fees`:**
+```python
+sum([$Platform_Fees or 0, $Tax or 0, $Settlement_Fees or 0, 
+     $Trading_Fees or 0, $CAT_Fees or 0, $Commission or 0, 
+     $Clearing_Fees or 0])
+```
+
+**`silver_transactions.Net_Amount`:**
+```python
+$Fill_Amount + $Total_Fees if $Side == "Buy" else $Fill_Amount - $Total_Fees
+```
+
+See `docs/03-grist-table-setup.md` for all formulas.
 
 ## Import Sample Data
 

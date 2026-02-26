@@ -838,11 +838,47 @@ curl -X POST \
 - Faster setup for new environments
 - Ensures consistency across dev/test/prod
 
+### Automated Table Setup Script
+
+The `scripts/setup_grist_tables.py` script automates table creation via the Grist API:
+
+```bash
+# Setup all tables in dev environment
+uv run python setup_grist_tables.py --env dev
+
+# Preview what would be created (dry run)
+uv run python setup_grist_tables.py --env dev --dry-run
+
+# List existing tables
+uv run python setup_grist_tables.py --env dev --list-tables
+```
+
+**What the script creates:**
+
+| Table | Layer | Columns |
+|-------|-------|---------|
+| `bronze_transactions` | Bronze | 30 columns (raw CSV data) |
+| `silver_stocks` | Silver | 9 columns (stock master data) |
+| `silver_transactions` | Silver | 20 columns (validated transactions) |
+| `gold_positions` | Gold | 10 columns (position calculations) |
+| `gold_stocks` | Gold | 14 columns (portfolio view) |
+| `gold_monthly_archive` | Gold | 11 columns (historical snapshots) |
+
+**Limitations:**
+- Creates basic column types (Text, Numeric, Choice, Toggle, DateTime)
+- **Formulas must be added manually** via Grist UI (see `docs/03-grist-table-setup.md`)
+- References between tables must be configured manually
+
+**Recommended workflow:**
+1. Run the automation script to create tables and columns
+2. Manually add formulas using the guide in `docs/03-grist-table-setup.md`
+3. Configure any special formatting or conditional styles
+
 ### Current Implementation Status
 
 - ✅ **Manual setup documented** in `docs/03-grist-table-setup.md`
-- ⏳ **API automation** - Possible via Grist API but requires custom script development
-- 💡 **Future enhancement** - Consider creating a `scripts/setup_grist_tables.py` automation script
+- ✅ **API automation script** - `scripts/setup_grist_tables.py` creates all tables and columns
+- ⏳ **Formula automation** - Formulas must still be added manually via Grist UI
 
 ## Testing Strategy
 
