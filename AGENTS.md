@@ -753,6 +753,97 @@ docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
 uv run python manage_env.py start test
 ```
 
+## Automated Table Setup
+
+The Grist API supports programmatic table and column creation, allowing you to automate the initial setup:
+
+### API Endpoints for Schema Management
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/docs/{docId}/tables` | POST | Create a new table |
+| `/api/docs/{docId}/columns` | POST | Add columns to a table |
+| `/api/docs/{docId}/tables/{tableId}` | PATCH | Modify table properties |
+| `/api/docs/{docId}/columns/{colId}` | PATCH | Modify column properties |
+
+### Example: Creating Tables via API
+
+```python
+import requests
+
+# Configuration
+API_KEY = "your_api_key"
+DOC_ID = "your_doc_id"
+BASE_URL = "http://localhost:8484/api"
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
+}
+
+# 1. Create bronze_transactions table
+tables = [
+    {
+        "id": "bronze_transactions",
+        "columns": [
+            {"id": "Import_ID", "type": "Text"},
+            {"id": "Import_Date", "type": "DateTime"},
+            {"id": "Source_File", "type": "Text"},
+            {"id": "Raw_Data", "type": "Text"},
+            {"id": "Side", "type": "Choice"},
+            {"id": "Symbol", "type": "Text"},
+            {"id": "Fill_Qty", "type": "Numeric"},
+            {"id": "Fill_Price", "type": "Numeric"},
+            {"id": "Fill_Amount", "type": "Numeric"},
+        ]
+    },
+    # Add more tables (silver_stocks, silver_transactions, etc.)
+]
+
+for table in tables:
+    response = requests.post(
+        f"{BASE_URL}/docs/{DOC_ID}/tables",
+        headers=headers,
+        json={"tables": [table]}
+    )
+    print(f"Created {table['id']}: {response.status_code}")
+```
+
+### Alternative: Document Template Approach
+
+For complex setups, consider using Grist's document copy API:
+
+1. **Create a template document** manually with all tables, columns, and formulas
+2. **Export the template** (optional - for backup)
+3. **Use the API to copy** the template for new environments:
+
+```bash
+# Get doc worker URL
+DOC_WORKER=$(curl -s -H "Authorization: Bearer $API_KEY" \
+  http://localhost:8484/api/worker/import | jq -r '.docWorkerUrl')
+
+# Copy template document
+curl -X POST \
+  -H "Authorization: Bearer $API_KEY" \
+  "${DOC_WORKER}copy?doc=TEMPLATE_DOC_ID&template=1"
+```
+
+### Recommended Approach for This Project
+
+**Phase 1 (Initial Setup)**: Create tables manually via Grist UI following `docs/03-grist-table-setup.md`
+
+**Phase 2 (Automation)**: Export your configured document as a template, then use the copy API for new environments
+
+**Benefits of Template Approach:**
+- Preserves formulas, conditional styles, and column configurations
+- Faster setup for new environments
+- Ensures consistency across dev/test/prod
+
+### Current Implementation Status
+
+- ✅ **Manual setup documented** in `docs/03-grist-table-setup.md`
+- ⏳ **API automation** - Possible via Grist API but requires custom script development
+- 💡 **Future enhancement** - Consider creating a `scripts/setup_grist_tables.py` automation script
+
 ## Testing Strategy
 
 Currently, this project relies on:
