@@ -1,0 +1,64 @@
+---
+# Grist Stock Tracker - Developer Mode Agent Configuration
+# Usage: kimi --agent-file .kimi/agent.yaml
+#
+# This agent is configured for full development work on the Grist Stock Tracker project.
+# It includes all necessary tools for Python development, Podman/Docker management,
+# and Grist integration.
+
+version: 1
+agent:
+  name: grist-stock-tracker-dev
+  
+  # Inherit from default agent as base
+  extend: default
+  
+  # System prompt for this project
+  system_prompt_path: ./.kimi/system-prompt.md
+  
+  # Project-specific variables available in system prompt
+  system_prompt_args:
+    PROJECT_NAME: "Grist Stock Tracker"
+    TECH_STACK: "Python, Grist, Podman, PostgreSQL"
+    ARCHITECTURE: "Medallion (Bronze/Silver/Gold)"
+    
+  # Exclude tools not needed for this project
+  exclude_tools:
+    # Exclude media file reading - not needed for stock tracking
+    - "kimi_cli.tools.file:ReadMediaFile"
+    
+    # Uncomment below to further restrict:
+    # - "kimi_cli.tools.shell:Shell"           # Block all shell commands
+    # - "kimi_cli.tools.web:SearchWeb"         # Block web search
+    # - "kimi_cli.tools.web:FetchURL"          # Block URL fetching
+    # - "kimi_cli.tools.multiagent:Task"       # Block subagent spawning
+
+  # Subagents for specialized tasks (optional)
+  subagents:
+    # Code reviewer subagent - focused on Python code review
+    reviewer:
+      path: ./.kimi/subagents/reviewer.yaml
+      description: "Python code review specialist"
+    
+    # Test writer subagent - focused on test generation
+    tester:
+      path: ./.kimi/subagents/tester.yaml
+      description: "Python test generation specialist"
+
+---
+# Security Notes:
+# 
+# 1. This configuration allows:
+#    - Shell command execution (docker-compose, podman, uv, etc.)
+#    - File read/write operations
+#    - Web search and URL fetching
+#    - Subagent spawning via Task tool
+#
+# 2. All write operations still require user approval (unless in YOLO mode)
+#
+# 3. To use this agent:
+#    kimi --agent-file .kimi/agent.yaml
+#
+# 4. To temporarily switch to this agent in an existing session:
+#    /reload (if already using a config file)
+#    Then restart kimi with the --agent-file flag
