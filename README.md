@@ -37,6 +37,12 @@ kimi --agent-file .kimi/agent.yaml
 - **reviewer** - Python code review specialist
 - **tester** - Test generation specialist
 
+### Security Features
+
+- File access restricted to project directory only
+- All file writes require user approval
+- Subagents run in isolated contexts
+
 See `.kimi/README.md` for detailed configuration options.
 
 ## Sample Data
