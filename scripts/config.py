@@ -1,7 +1,7 @@
 """Configuration management for Grist Stock Tracker.
 
-Supports multiple environments: development, test, production.
-Environment is determined by the ENVIRONMENT variable (default: development).
+Supports multiple environments: dev, test, production.
+Environment is determined by the ENVIRONMENT variable (default: dev).
 """
 
 import os
@@ -29,7 +29,7 @@ class Config:
     @classmethod
     def _get_env(cls) -> str:
         """Get current environment from ENVIRONMENT variable."""
-        return os.getenv("ENVIRONMENT", "development")
+        return os.getenv("ENVIRONMENT", "dev")
 
     @classmethod
     @property
@@ -42,7 +42,7 @@ class Config:
         """Get Grist configuration for the specified or current environment.
 
         Args:
-            override_env: Optional environment override ('test', 'prod', 'development')
+            override_env: Optional environment override ('test', 'prod', 'dev')
 
         Returns:
             GristConfig instance with environment-specific settings
@@ -61,7 +61,7 @@ class Config:
                 api_key=os.getenv("PROD_GRIST_API_KEY", ""),
                 doc_id=os.getenv("PROD_GRIST_DOC_ID", ""),
             )
-        else:  # development (default)
+        else:  # dev (default)
             return GristConfig(
                 url=os.getenv("GRIST_URL", "http://localhost:8484"),
                 api_key=os.getenv("GRIST_API_KEY", ""),
@@ -79,9 +79,9 @@ class Config:
         return cls._get_env() in ("production", "prod")
 
     @classmethod
-    def is_development(cls) -> bool:
-        """Check if running in development environment."""
-        return cls._get_env() in ("development", "dev")
+    def is_dev(cls) -> bool:
+        """Check if running in dev environment."""
+        return cls._get_env() in ("dev", "development")
 
 
 # Convenience function for getting config

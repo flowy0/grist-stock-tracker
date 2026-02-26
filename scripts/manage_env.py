@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Environment management script for Grist Stock Tracker.
 
-Manages switching between development, test, and production environments.
+Manages switching between dev, test, and production environments.
 
 Usage:
     uv run python manage_env.py status              # Show current environment
@@ -11,7 +11,7 @@ Usage:
     uv run python manage_env.py logs [env]          # Show logs for environment
 
 Environments:
-    development  - Local development (port 8484, ./grist-data)
+    dev          - Local development (port 8484, ./grist-data)
     test         - Test environment (port 8485, ./grist-data-test)
     production   - Production environment (port 8484, ./grist-data-prod)
 """
@@ -34,7 +34,7 @@ DOCKER_COMPOSE_TEST = PROJECT_ROOT / "docker-compose.test.yml"
 
 def get_current_env() -> str:
     """Get current environment from ENVIRONMENT variable."""
-    return os.getenv("ENVIRONMENT", "development")
+    return os.getenv("ENVIRONMENT", "dev")
 
 
 def show_status():
@@ -58,7 +58,7 @@ def show_status():
     # Show data directories
     print("\nData directories:")
     for name, path in [
-        ("development", PROJECT_ROOT / "grist-data"),
+        ("dev", PROJECT_ROOT / "grist-data"),
         ("test", PROJECT_ROOT / "grist-data-test"),
         ("production", PROJECT_ROOT / "grist-data-prod"),
     ]:
@@ -127,7 +127,7 @@ def stop_environment(env: str = None):
 
 def switch_environment(env: str):
     """Switch to a different environment."""
-    valid_envs = ["development", "test", "production"]
+    valid_envs = ["dev", "test", "production"]
 
     if env not in valid_envs:
         print(f"Invalid environment: {env}")
@@ -204,22 +204,22 @@ Examples:
 
     # Start command
     start_parser = subparsers.add_parser("start", help="Start environment")
-    start_parser.add_argument("env", nargs="?", choices=["development", "test", "production"],
+    start_parser.add_argument("env", nargs="?", choices=["dev", "test", "production"],
                              help="Environment to start (default: current)")
 
     # Stop command
     stop_parser = subparsers.add_parser("stop", help="Stop environment")
-    stop_parser.add_argument("env", nargs="?", choices=["development", "test", "production"],
+    stop_parser.add_argument("env", nargs="?", choices=["dev", "test", "production"],
                             help="Environment to stop (default: current)")
 
     # Switch command
     switch_parser = subparsers.add_parser("switch", help="Switch environment")
-    switch_parser.add_argument("env", choices=["development", "test", "production"],
+    switch_parser.add_argument("env", choices=["dev", "test", "production"],
                               help="Environment to switch to")
 
     # Logs command
     logs_parser = subparsers.add_parser("logs", help="Show environment logs")
-    logs_parser.add_argument("env", nargs="?", choices=["development", "test", "production"],
+    logs_parser.add_argument("env", nargs="?", choices=["dev", "test", "production"],
                             help="Environment to show logs for (default: current)")
     logs_parser.add_argument("-f", "--follow", action="store_true",
                             help="Follow log output")

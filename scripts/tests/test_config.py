@@ -12,17 +12,17 @@ class TestConfig:
     """Test configuration management."""
 
     def test_default_environment(self):
-        """Test that default environment is development."""
+        """Test that default environment is dev."""
         with mock.patch.dict(os.environ, {}, clear=True):
             # Reload to get fresh instance
             from config import Config
-            assert Config.ENVIRONMENT == "development"
+            assert Config.ENVIRONMENT == "dev"
 
-    def test_is_development(self):
-        """Test is_development check."""
-        with mock.patch.dict(os.environ, {"ENVIRONMENT": "development"}):
+    def test_is_dev(self):
+        """Test is_dev check."""
+        with mock.patch.dict(os.environ, {"ENVIRONMENT": "dev"}):
             from config import Config
-            assert Config.is_development() is True
+            assert Config.is_dev() is True
             assert Config.is_test() is False
             assert Config.is_production() is False
 
@@ -31,7 +31,7 @@ class TestConfig:
         with mock.patch.dict(os.environ, {"ENVIRONMENT": "test"}):
             from config import Config
             assert Config.is_test() is True
-            assert Config.is_development() is False
+            assert Config.is_dev() is False
             assert Config.is_production() is False
 
     def test_is_production(self):
@@ -39,7 +39,7 @@ class TestConfig:
         with mock.patch.dict(os.environ, {"ENVIRONMENT": "production"}):
             from config import Config
             assert Config.is_production() is True
-            assert Config.is_development() is False
+            assert Config.is_dev() is False
             assert Config.is_test() is False
 
     def test_prod_alias(self):
@@ -52,10 +52,10 @@ class TestConfig:
 class TestGristConfig:
     """Test Grist configuration."""
 
-    def test_development_config(self):
-        """Test development environment config."""
+    def test_dev_config(self):
+        """Test dev environment config."""
         env_vars = {
-            "ENVIRONMENT": "development",
+            "ENVIRONMENT": "dev",
             "GRIST_URL": "http://dev:8484",
             "GRIST_API_KEY": "dev_key",
             "GRIST_DOC_ID": "dev_doc",
@@ -69,7 +69,7 @@ class TestGristConfig:
     def test_test_config(self):
         """Test test environment config."""
         env_vars = {
-            "ENVIRONMENT": "development",  # Current env
+            "ENVIRONMENT": "dev",  # Current env
             "TEST_GRIST_URL": "http://test:8485",
             "TEST_GRIST_API_KEY": "test_key",
             "TEST_GRIST_DOC_ID": "test_doc",
@@ -83,7 +83,7 @@ class TestGristConfig:
     def test_production_config(self):
         """Test production environment config."""
         env_vars = {
-            "ENVIRONMENT": "development",
+            "ENVIRONMENT": "dev",
             "PROD_GRIST_URL": "http://prod:8484",
             "PROD_GRIST_API_KEY": "prod_key",
             "PROD_GRIST_DOC_ID": "prod_doc",
@@ -97,7 +97,7 @@ class TestGristConfig:
     def test_default_urls(self):
         """Test default URLs when not set."""
         with mock.patch.dict(os.environ, {}, clear=True):
-            config = get_config("development")
+            config = get_config("dev")
             assert config.url == "http://localhost:8484"
             
             config = get_config("test")

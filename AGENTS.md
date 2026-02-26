@@ -645,7 +645,7 @@ The project supports three environments with isolated data and configurations:
 
 | Environment | Port | Data Directory | Purpose |
 |-------------|------|----------------|---------|
-| `development` | 8484 | `./grist-data` | Local development |
+| `dev` | 8484 | `./grist-data` | Local development |
 | `test` | 8485 | `./grist-data-test` | Testing and CI/CD |
 | `production` | 8484 | `./grist-data-prod` | Production deployment |
 
@@ -653,22 +653,49 @@ The project supports three environments with isolated data and configurations:
 
 Set environment via `ENVIRONMENT` variable in `.env`:
 ```bash
-ENVIRONMENT=development  # or test, production
+ENVIRONMENT=dev  # or test, production
+```
+
+**Environment Variable Resolution:**
+
+| ENVIRONMENT | Variables Used | Default URL |
+|-------------|----------------|-------------|
+| `dev` | `GRIST_API_KEY`, `GRIST_DOC_ID` | http://localhost:8484 |
+| `test` | `TEST_GRIST_API_KEY`, `TEST_GRIST_DOC_ID` | http://localhost:8485 |
+| `production` | `PROD_GRIST_API_KEY`, `PROD_GRIST_DOC_ID` | http://localhost:8484 |
+
+The `config.py` module provides `get_config()` which returns the appropriate `GristConfig` based on `ENVIRONMENT`:
+
+```python
+from config import get_config, Config
+
+# Get config for current ENVIRONMENT
+config = get_config()
+print(config.url)      # Uses GRIST_URL, TEST_GRIST_URL, or PROD_GRIST_URL
+print(config.api_key)  # Uses GRIST_API_KEY, TEST_GRIST_API_KEY, or PROD_GRIST_API_KEY
+
+# Override environment
+config = get_config("test")  # Force test config regardless of ENVIRONMENT
+
+# Check current environment
+if Config.is_dev():        # True when ENVIRONMENT=dev
+if Config.is_test():       # True when ENVIRONMENT=test  
+if Config.is_production(): # True when ENVIRONMENT=production
 ```
 
 Environment-specific variables:
 ```bash
-# Development
+# Development (ENVIRONMENT=dev)
 GRIST_URL=http://localhost:8484
 GRIST_API_KEY=dev_key
 GRIST_DOC_ID=dev_doc
 
-# Test
+# Test (ENVIRONMENT=test)
 TEST_GRIST_URL=http://localhost:8485
 TEST_GRIST_API_KEY=test_key
 TEST_GRIST_DOC_ID=test_doc
 
-# Production
+# Production (ENVIRONMENT=production)
 PROD_GRIST_URL=http://localhost:8484
 PROD_GRIST_API_KEY=prod_key
 PROD_GRIST_DOC_ID=prod_doc

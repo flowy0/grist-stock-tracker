@@ -11,9 +11,9 @@ Usage:
     uv run python csv_import_helper.py samples/test.csv --env test
 
 Environment Variables:
-    ENVIRONMENT: Current environment (development | test | production)
-    GRIST_DOC_ID: Grist document ID (development)
-    GRIST_API_KEY: Grist API key (development)
+    ENVIRONMENT: Current environment (dev | test | production)
+    GRIST_DOC_ID: Grist document ID (dev)
+    GRIST_API_KEY: Grist API key (dev)
     TEST_GRIST_DOC_ID: Grist document ID (test)
     TEST_GRIST_API_KEY: Grist API key (test)
     PROD_GRIST_DOC_ID: Grist document ID (production)
@@ -237,7 +237,7 @@ Examples:
     parser.add_argument("csv_file", help="Path to moomoo CSV export file")
     parser.add_argument(
         "--env",
-        choices=["development", "test", "production"],
+        choices=["dev", "test", "production"],
         help="Environment to use (overrides ENVIRONMENT variable)",
     )
     parser.add_argument(

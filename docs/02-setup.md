@@ -23,22 +23,45 @@ cd grist-stock-tracker
 ```bash
 # Copy environment template
 cp .env.example .env
+```
 
-# Edit .env with your settings
-# Set your environment: development | test | production
-ENVIRONMENT=development
+#### Environment Variable Reference
 
-# For development (default on port 8484)
-GRIST_API_KEY=your_api_key
-GRIST_DOC_ID=your_doc_id
+The `ENVIRONMENT` variable controls which configuration is used:
+
+| Variable | Purpose | Example |
+|----------|---------|---------|
+| `ENVIRONMENT` | Active environment: `dev`, `test`, or `production` | `ENVIRONMENT=dev` |
+| `GRIST_API_KEY` | API key for dev environment | (from Grist UI) |
+| `GRIST_DOC_ID` | Document ID for dev environment | (from Grist URL) |
+| `TEST_GRIST_API_KEY` | API key for test environment | (from Grist UI) |
+| `TEST_GRIST_DOC_ID` | Document ID for test environment | (from Grist URL) |
+| `PROD_GRIST_API_KEY` | API key for production environment | (from Grist UI) |
+| `PROD_GRIST_DOC_ID` | Document ID for production environment | (from Grist URL) |
+
+**How it works:**
+- Scripts read `ENVIRONMENT` to determine which config to use
+- When `ENVIRONMENT=dev`, scripts use `GRIST_API_KEY` and `GRIST_DOC_ID`
+- When `ENVIRONMENT=test`, scripts use `TEST_GRIST_API_KEY` and `TEST_GRIST_DOC_ID`
+- Override with `--env` flag: `python script.py --env test`
+
+**Example .env file:**
+
+```bash
+# Set your environment: dev | test | production
+ENVIRONMENT=dev
+
+# For dev environment (port 8484)
+GRIST_API_KEY=your_api_key_here
+GRIST_DOC_ID=your_doc_id_here
 
 # For test environment (port 8485)
-TEST_GRIST_API_KEY=your_test_api_key
-TEST_GRIST_DOC_ID=your_test_doc_id
+TEST_GRIST_API_KEY=your_test_api_key_here
+TEST_GRIST_DOC_ID=your_test_doc_id_here
 
 # For production environment (port 8484)
-PROD_GRIST_API_KEY=your_prod_api_key
-PROD_GRIST_DOC_ID=your_prod_doc_id
+PROD_GRIST_API_KEY=your_prod_api_key_here
+PROD_GRIST_DOC_ID=your_prod_doc_id_here
 ```
 
 ### 3. Start Podman Machine (macOS)
@@ -97,43 +120,75 @@ uv run pytest tests/ -v -m "not ui"
 
 ## Environment Management
 
-The project supports three isolated environments:
+The project supports three isolated environments, each with separate data directories and configurations:
 
-| Environment | Port | Data Directory | Use Case |
-|-------------|------|----------------|----------|
-| `development` | 8484 | `./grist-data` | Daily development |
-| `test` | 8485 | `./grist-data-test` | Testing, experiments |
-| `production` | 8484 | `./grist-data-prod` | Live data |
+| Environment | Port | Data Directory | Config Variables | Use Case |
+|-------------|------|----------------|------------------|----------|
+| `dev` | 8484 | `./grist-data` | `GRIST_API_KEY`, `GRIST_DOC_ID` | Daily development |
+| `test` | 8485 | `./grist-data-test` | `TEST_GRIST_API_KEY`, `TEST_GRIST_DOC_ID` | Testing, experiments |
+| `production` | 8484 | `./grist-data-prod` | `PROD_GRIST_API_KEY`, `PROD_GRIST_DOC_ID` | Live data |
+
+### How Environment Variables Work
+
+1. **`ENVIRONMENT`** sets the active environment (default: `dev`)
+2. Scripts automatically load the correct config based on `ENVIRONMENT`
+3. Each environment uses different Grist document IDs and API keys
+4. Data is isolated in separate directories
+
+**Example workflow:**
+```bash
+# .env file
+ENVIRONMENT=dev
+GRIST_API_KEY=key_for_dev_doc
+TEST_GRIST_API_KEY=key_for_test_doc
+
+# This uses dev config (GRIST_API_KEY)
+uv run python csv_import_helper.py data.csv
+
+# This uses test config (TEST_GRIST_API_KEY)  
+uv run python csv_import_helper.py data.csv --env test
+```
 
 ### Switching Environments
 
 ```bash
 cd scripts
 
-# Check current environment
+# Check current environment and container status
 uv run python manage_env.py status
 
-# Switch to test environment
+# Switch ENVIRONMENT in .env file
 uv run python manage_env.py switch test
 
-# Start test environment (different port)
+# Start containers for current environment
+uv run python manage_env.py start
+
+# Or start specific environment (ignores .env)
 uv run python manage_env.py start test
 
-# Switch back to development
-uv run python manage_env.py switch development
-uv run python manage_env.py start
+# View logs
+uv run python manage_env.py logs -f
+
+# Stop environment
+uv run python manage_env.py stop
 ```
 
 ### Using Different Environments in Scripts
 
+All scripts support the `--env` flag to override the default:
+
 ```bash
-# Import to test environment
+# Import to test environment (uses TEST_GRIST_API_KEY)
 uv run python csv_import_helper.py data.csv --env test
 
-# Update prices in production
+# Update prices in production (uses PROD_GRIST_API_KEY)
 uv run python price_updater.py --env production
 
-# Run transformation in development (default)
+# Run transformation using current ENVIRONMENT
+uv run python bronze_to_silver.py
+
+# Override doc ID for one-time use
+uv run python csv_import_helper.py data.csv --env test --doc-id special_doc
 uv run python bronze_to_silver.py
 ```
 
