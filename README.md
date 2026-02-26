@@ -35,7 +35,8 @@ kimi --agent-file .kimi/agent.yaml
 ### Available Subagents
 
 - **reviewer** - Python code review specialist
-- **tester** - Test generation specialist
+- **tester** - Test generation specialist  
+- **git** - Git workflow specialist (branch/PR management)
 
 ### Security Features
 
