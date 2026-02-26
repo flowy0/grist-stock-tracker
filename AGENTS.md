@@ -83,7 +83,7 @@ grist-stock-tracker/
 ├── .env.example                # Environment template (root)
 ├── README.md                   # User-facing documentation
 ├── AGENTS.md                   # This file - agent guide
-├── docker/                     # Docker configuration (.env file)
+
 ├── docs/                       # Documentation
 │   ├── 01-project-spec.md      # Detailed project specification
 │   ├── prompts.txt             # Original project generation prompt
@@ -432,8 +432,8 @@ return sum(t.Fill_Amount - (t.Fill_Qty * $Avg_Cost_Basis) for t in txns)
 
 ```bash
 # 1. Clone and configure
-cp .env.example docker/.env  # Note: docker/.env is used by compose
-# Edit docker/.env with your settings
+cp .env.example .env
+# Edit .env with your settings
 
 # 2. Start the application (using podman via docker alias)
 docker-compose up -d
@@ -501,7 +501,7 @@ After starting the machine, re-run your docker-compose commands.
 
 ## Environment Configuration
 
-Copy `.env.example` to `docker/.env` and configure:
+Copy `.env.example` to `.env` and configure:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -534,7 +534,6 @@ All commands run from this directory. No `cd` needed:
 - **scripts/**: Python automation scripts (CSV import, price updates)
 - **templates/**: Grist document templates (.grist files)
 - **docs/**: Additional documentation
-- **docker/**: Container configuration (Podman/Docker)
 
 ### Python Best Practices
 

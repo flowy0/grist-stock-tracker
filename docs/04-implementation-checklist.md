@@ -5,7 +5,7 @@ This document outlines the implementation tasks for the Grist Stock Tracker proj
 ## Phase 1: Infrastructure & Setup
 
 ### Podman Environment
-- [ ] Create `docker/.env` from `.env.example` with secure secrets
+- [ ] Create `.env` from `.env.example` with secure secrets
 - [ ] Test `docker-compose up -d` basic startup (using podman via alias)
 - [ ] Test with PostgreSQL profile: `docker-compose --profile postgres up -d`
 - [ ] Verify Grist accessible at http://localhost:8484
