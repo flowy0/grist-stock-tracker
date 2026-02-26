@@ -4,7 +4,7 @@
 #
 # This agent is configured for full development work on the Grist Stock Tracker project.
 # It includes all necessary tools for Python development, Podman/Docker management,
-# and Grist integration.
+# Git workflows, and Grist integration.
 
 version: 1
 agent:
@@ -21,6 +21,8 @@ agent:
     PROJECT_NAME: "Grist Stock Tracker"
     TECH_STACK: "Python, Grist, Podman, PostgreSQL"
     ARCHITECTURE: "Medallion (Bronze/Silver/Gold)"
+    DEFAULT_BRANCH: "main"
+    DEV_BRANCH: "dev"
     
   # Exclude tools not needed for this project
   exclude_tools:
@@ -33,13 +35,7 @@ agent:
     # - "kimi_cli.tools.web:FetchURL"          # Block URL fetching
     # - "kimi_cli.tools.multiagent:Task"       # Block subagent spawning
 
-  # SECURITY NOTE: File Access Restriction
-  # This agent is configured to only work within the project directory.
-  # The system prompt explicitly forbids accessing files outside ${KIMI_WORK_DIR}.
-  # However, the AI can still technically access files outside with absolute paths.
-  # User approval is required for all file write operations as an additional safeguard.
-
-  # Subagents for specialized tasks (optional)
+  # Subagents for specialized tasks
   subagents:
     # Code reviewer subagent - focused on Python code review
     reviewer:
@@ -50,21 +46,30 @@ agent:
     tester:
       path: ./.kimi/subagents/tester.yaml
       description: "Python test generation specialist"
+    
+    # Git workflow subagent - handles branch/PR operations
+    git:
+      path: ./.kimi/subagents/git.yaml
+      description: "Git workflow specialist for branch and PR management"
 
 ---
-# Security Notes:
-# 
-# 1. This configuration allows:
-#    - Shell command execution (docker-compose, podman, uv, etc.)
-#    - File read/write operations
-#    - Web search and URL fetching
-#    - Subagent spawning via Task tool
+# Git Workflow Configuration
 #
-# 2. All write operations still require user approval (unless in YOLO mode)
+# This agent supports git operations including:
+# - Branch creation and switching
+# - Committing changes
+# - Pushing to remote
+# - Creating GitHub PRs (requires gh CLI or MCP)
 #
-# 3. To use this agent:
-#    kimi --agent-file .kimi/agent.yaml
+# Git Workflow:
+# 1. Create feature branch: git checkout -b feature/name
+# 2. Make changes and commit: git add . && git commit -m "feat: ..."
+# 3. Push: git push -u origin feature/name
+# 4. Create PR: gh pr create --title "..." --body "..." --base dev
 #
-# 4. To temporarily switch to this agent in an existing session:
-#    /reload (if already using a config file)
-#    Then restart kimi with the --agent-file flag
+# PRs should target the 'dev' branch, not 'main' directly.
+#
+# SECURITY NOTE: File Access Restriction
+# This agent is configured to only work within the project directory.
+# The system prompt explicitly forbids accessing files outside ${KIMI_WORK_DIR}.
+# User approval is required for all file write operations as an additional safeguard.

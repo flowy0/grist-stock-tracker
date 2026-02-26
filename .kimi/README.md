@@ -53,6 +53,20 @@ The AI will spawn the `tester` subagent which will:
 - Aim for >80% coverage
 - Follow project testing conventions
 
+### 3. Git Workflow
+
+Use for branch management and PR creation:
+
+```
+Please use the git subagent to create a feature branch for the CSV import work
+```
+
+The AI will spawn the `git` subagent which will:
+- Create and switch branches
+- Stage and commit changes
+- Push to remote
+- Create GitHub PRs (if `gh` CLI is available)
+
 ## Tool Permissions
 
 This developer agent has access to:
@@ -119,6 +133,64 @@ Edit `system-prompt.md` to modify the AI's behavior and context.
 1. Create a new file in `subagents/` (e.g., `documenter.yaml`)
 2. Add to `agent.yaml` under `subagents:`
 3. Use via Task tool
+
+## GitHub PR Creation
+
+To enable GitHub PR creation, you need the GitHub CLI (`gh`) installed and authenticated:
+
+### Install GitHub CLI
+
+**macOS:**
+```bash
+brew install gh
+```
+
+**Linux:**
+```bash
+# Debian/Ubuntu
+sudo apt install gh
+
+# Fedora
+sudo dnf install gh
+```
+
+### Authenticate
+
+```bash
+gh auth login
+# Follow prompts to authenticate with GitHub
+```
+
+### Verify Setup
+
+```bash
+gh --version
+gh auth status
+```
+
+### Creating PRs
+
+Once configured, the agent can create PRs:
+
+```bash
+# Create PR targeting dev branch
+gh pr create --title "feat: add CSV import helper" \
+             --body "Implements bronze to silver layer transformation" \
+             --base dev
+```
+
+### Alternative: GitHub MCP Server
+
+You can also add GitHub as an MCP server for native integration:
+
+```bash
+kimi mcp add --transport http --auth oauth github https://api.github.com/mcp
+```
+
+Then authenticate:
+```bash
+kimi mcp auth github
+```
 
 ## Troubleshooting
 
