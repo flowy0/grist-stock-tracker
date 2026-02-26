@@ -39,7 +39,7 @@ cp .env.example .env
 podman machine start
 
 # 4. Start Grist
-docker-compose up -d grist
+docker compose up -d grist
 
 # 5. Setup Python environment
 cd scripts && uv sync

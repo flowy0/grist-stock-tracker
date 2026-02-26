@@ -78,10 +78,10 @@ podman machine start
 
 ```bash
 # Start Grist container
-docker-compose up -d grist
+docker compose up -d grist
 
 # Check logs
-docker-compose logs -f grist
+docker compose logs -f grist
 ```
 
 Grist will be available at: http://localhost:8484
@@ -349,11 +349,11 @@ podman machine start
 **First-time setup hangs**
 ```bash
 # Restart container
-docker-compose restart grist
+docker compose restart grist
 
 # Clear data and start fresh (WARNING: loses all data)
 rm -rf grist-data/*
-docker-compose up -d grist
+docker compose up -d grist
 ```
 
 **API calls return 401 Unauthorized**
@@ -415,7 +415,7 @@ Enable backup service in docker-compose.yml:
 
 ```bash
 # Start with backup profile
-docker-compose --profile backup up -d
+docker compose --profile backup up -d
 
 # Backups stored in ./backups
 # Runs daily at 2 AM with 30-day retention
@@ -425,14 +425,14 @@ docker-compose --profile backup up -d
 
 ```bash
 # Stop Grist
-docker-compose stop grist
+docker compose stop grist
 
 # Restore data
 rm -rf grist-data/*
 cp -r backups/grist-backup-YYYYMMDD/* grist-data/
 
 # Restart
-docker-compose up -d grist
+docker compose up -d grist
 ```
 
 ## Next Steps

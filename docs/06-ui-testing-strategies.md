@@ -263,7 +263,7 @@ uv run pytest tests/ -v
 ```bash
 cd scripts
 # Start Grist if not running
-docker-compose up -d
+docker compose up -d
 
 # Run UI tests
 uv run pytest tests/ui/ -v --headed  # Show browser
@@ -308,7 +308,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Start Grist
-        run: docker-compose up -d
+        run: docker compose up -d
       - name: Run UI tests
         run: |
           cd scripts

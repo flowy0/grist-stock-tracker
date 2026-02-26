@@ -436,7 +436,7 @@ cp .env.example .env
 # Edit .env with your settings
 
 # 2. Start the application (using podman via docker alias)
-docker-compose up -d
+docker compose up -d
 
 # 3. Access Grist at http://localhost:8484
 ```
@@ -445,37 +445,37 @@ docker-compose up -d
 
 ```bash
 # Start with PostgreSQL
-docker-compose --profile postgres up -d
+docker compose --profile postgres up -d
 
 # Start with backup service
-docker-compose --profile backup up -d
+docker compose --profile backup up -d
 
 # Start all services
-docker-compose --profile postgres --profile backup up -d
+docker compose --profile postgres --profile backup up -d
 
 # View logs
-docker-compose logs -f grist
+docker compose logs -f grist
 
 # Stop all services
-docker-compose down
+docker compose down
 
 # Stop and remove volumes (WARNING: deletes data)
-docker-compose down -v
+docker compose down -v
 
 # Backup manually
-docker-compose exec backup backup
+docker compose exec backup backup
 
 # Restore from backup
-# 1. Stop containers: docker-compose down
+# 1. Stop containers: docker compose down
 # 2. Extract backup to grist-data/
-# 3. Restart: docker-compose up -d
+# 3. Restart: docker compose up -d
 ```
 
 ### Podman-Specific Notes
 
 - Podman runs containers rootless by default (more secure)
 - No Docker daemon required
-- Uses `docker-compose` command via alias to `podman-compose` or compatible tool
+- Uses `docker compose` command via alias to `podman-compose` or compatible tool
 - Volume mounts work the same way as Docker
 - All `docker` commands in this guide are executed via the `docker=podman` alias
 
@@ -497,7 +497,7 @@ podman machine init
 podman machine start
 ```
 
-After starting the machine, re-run your docker-compose commands.
+After starting the machine, re-run your docker compose commands.
 
 ## Environment Configuration
 
@@ -527,7 +527,7 @@ The project working directory is preset to:
 All commands run from this directory. No `cd` needed:
 - ✅ `git status`
 - ✅ `ls samples/`
-- ✅ `docker-compose up -d`
+- ✅ `docker compose up -d`
 
 ### Code Organization
 
@@ -743,7 +743,7 @@ Test environment uses an override file for different port and data directory:
 
 ```bash
 # Start test environment
-docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
 
 # Or use the management script
 uv run python manage_env.py start test

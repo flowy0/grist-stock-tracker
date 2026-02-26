@@ -82,7 +82,7 @@ def start_environment(env: str = None):
     if env == "test":
         # Test environment uses override file
         subprocess.run(
-            ["docker-compose", "-f", str(DOCKER_COMPOSE), "-f", str(DOCKER_COMPOSE_TEST), "up", "-d"],
+            ["docker", "compose", "-f", str(DOCKER_COMPOSE), "-f", str(DOCKER_COMPOSE_TEST), "up", "-d"],
             cwd=PROJECT_ROOT,
             check=True,
         )
@@ -94,7 +94,7 @@ def start_environment(env: str = None):
         env_vars["GRIST_DATA_DIR"] = data_dir
 
         subprocess.run(
-            ["docker-compose", "up", "-d"],
+            ["docker", "compose", "up", "-d"],
             cwd=PROJECT_ROOT,
             env=env_vars,
             check=True,
@@ -111,13 +111,13 @@ def stop_environment(env: str = None):
 
     if env == "test":
         subprocess.run(
-            ["docker-compose", "-f", str(DOCKER_COMPOSE), "-f", str(DOCKER_COMPOSE_TEST), "down"],
+            ["docker", "compose", "-f", str(DOCKER_COMPOSE), "-f", str(DOCKER_COMPOSE_TEST), "down"],
             cwd=PROJECT_ROOT,
             check=True,
         )
     else:
         subprocess.run(
-            ["docker-compose", "down"],
+            ["docker", "compose", "down"],
             cwd=PROJECT_ROOT,
             check=True,
         )
@@ -171,12 +171,12 @@ def show_logs(env: str = None, follow: bool = False):
     """Show logs for the specified environment."""
     env = env or get_current_env()
 
-    cmd = ["docker-compose", "logs"]
+    cmd = ["docker", "compose", "logs"]
     if follow:
         cmd.append("-f")
 
     if env == "test":
-        cmd = ["docker-compose", "-f", str(DOCKER_COMPOSE), "-f", str(DOCKER_COMPOSE_TEST), "logs"]
+        cmd = ["docker", "compose", "-f", str(DOCKER_COMPOSE), "-f", str(DOCKER_COMPOSE_TEST), "logs"]
         if follow:
             cmd.append("-f")
 
