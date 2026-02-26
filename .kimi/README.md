@@ -183,14 +183,39 @@ gh pr create --title "feat: add CSV import helper" \
 
 You can also add GitHub as an MCP server for native integration:
 
+See `github-mcp-setup.md` for detailed instructions.
+
+**Quick setup:**
+
 ```bash
-kimi mcp add --transport http --auth oauth github https://api.github.com/mcp
+# Option 1: Using npx (recommended)
+kimi mcp add --transport stdio github -- npx -y @github/mcp-server@latest
+
+# Option 2: With GitHub token
+export GITHUB_TOKEN="your-token"
+kimi mcp add --transport stdio github -- npx -y @github/mcp-server@latest --token "$GITHUB_TOKEN"
 ```
 
-Then authenticate:
+Then verify:
 ```bash
-kimi mcp auth github
+kimi mcp list
+kimi mcp test github
 ```
+
+**Using MCP in Kimi:**
+
+```bash
+# Start with MCP config
+kimi --agent-file .kimi/agent.yaml --mcp-config-file ~/.kimi/mcp.json
+```
+
+With MCP enabled, the agent can use native GitHub tools like:
+- `github_create_pull_request`
+- `github_list_pull_requests`
+- `github_create_issue`
+- `github_add_comment`
+
+See `github-mcp-setup.md` for complete documentation.
 
 ## Troubleshooting
 
