@@ -87,6 +87,12 @@ class GristAPI:
         result = self._make_request("GET", endpoint)
         return result.get("tables", [])
 
+    def table_exists(self, table_id: str) -> bool:
+        """Check if a table exists (case-insensitive)."""
+        tables = self.get_tables()
+        existing_ids = [t.get("id", "").lower() for t in tables]
+        return table_id.lower() in existing_ids
+
     def get_records(self, table_id: str) -> list:
         """Get records from a table."""
         endpoint = f"docs/{self.doc_id}/tables/{table_id}/records"
@@ -211,13 +217,26 @@ class CSVImporter:
                 logger.info(f"  ... and {len(records) - 3} more")
             return len(records)
 
+        # Check if table exists
+        if not self.grist_api.table_exists("bronze_transactions"):
+            logger.error("❌ Table 'bronze_transactions' not found in Grist document")
+            logger.error("")
+            logger.error("Run the setup script first to create the tables:")
+            logger.error("  uv run python setup_grist_tables.py --env dev")
+            logger.error("")
+            logger.error("Or check existing tables:")
+            logger.error("  uv run python setup_grist_tables.py --env dev --list-tables")
+            raise RuntimeError("Required table 'bronze_transactions' does not exist")
+
         # Insert into Grist
         try:
             result = self.grist_api.add_records("bronze_transactions", records)
             logger.info(f"Successfully inserted {len(records)} records into bronze_transactions")
             return len(records)
-        except Exception as e:
-            logger.error(f"Failed to insert records: {e}")
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                logger.error("❌ Table 'bronze_transactions' not found (404)")
+                logger.error("Run: uv run python setup_grist_tables.py --env dev")
             raise
 
 
