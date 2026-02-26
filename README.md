@@ -17,10 +17,10 @@ A self-hosted stock portfolio tracking application built on Grist, featuring spr
 
 | Document | Description |
 |----------|-------------|
-| `docs/SETUP.md` | **Complete setup guide** - Start here! |
+| `docs/02-setup.md` | **Complete setup guide** - Start here! |
 | `AGENTS.md` | Complete technical guide for development |
-| `docs/grist-table-setup.md` | Step-by-step Grist table creation |
-| `docs/sample-files-readme.md` | Documentation for sample CSV files |
+| `docs/03-grist-table-setup.md` | Step-by-step Grist table creation |
+| `docs/05-sample-files-readme.md` | Documentation for sample CSV files |
 | `docs/01-project-spec.md` | Detailed project specification |
 | `.kimi/README.md` | Kimi Code agent configuration guide |
 
@@ -48,7 +48,7 @@ cd scripts && uv sync
 uv run pytest tests/ -v -m "not ui"
 ```
 
-**Full setup instructions**: See [`docs/SETUP.md`](docs/SETUP.md)
+**Full setup instructions**: See [`docs/02-setup.md`](docs/02-setup.md)
 
 ## Development with Kimi Code
 
@@ -73,7 +73,7 @@ See `.kimi/README.md` for detailed configuration.
 grist-stock-tracker/
 ├── docker-compose.yml     # Container orchestration
 ├── docs/                  # Documentation
-│   └── SETUP.md          # Complete setup guide
+│   ├── 02-setup.md          # Complete setup guide
 ├── scripts/              # Python automation
 │   ├── csv_import_helper.py
 │   ├── bronze_to_silver.py

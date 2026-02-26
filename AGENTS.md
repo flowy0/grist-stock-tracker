@@ -88,7 +88,7 @@ grist-stock-tracker/
 │   ├── 01-project-spec.md      # Detailed project specification
 │   ├── prompts.txt             # Original project generation prompt
 │   ├── markmap.svg             # Visual project mind map
-│   └── sample-files-readme.md  # Documentation for sample files
+│   ├── 05-sample-files-readme.md  # Documentation for sample files
 ├── samples/                    # Sample input files for testing
 │   ├── sample-template-input.csv   # Original template (2 rows)
 │   ├── sample-minimal-test.csv     # Minimal test file (7 rows)
@@ -619,7 +619,7 @@ Planned scripts to add to `scripts/`:
 
 ### CSV Import Format
 
-The project supports importing from moomoo export format. See `docs/sample-files-readme.md` for detailed documentation of the CSV format and available sample files.
+The project supports importing from moomoo export format. See `docs/05-sample-files-readme.md` for detailed documentation of the CSV format and available sample files.
 
 **Sample Files Available** (in `samples/` folder):
 
@@ -687,9 +687,9 @@ When using a reverse proxy, ensure WebSocket support is enabled (required for Gr
 | `docker-compose.yml` | Service definitions and orchestration |
 | `.env.example` | Configuration template |
 | `docs/01-project-spec.md` | Detailed specification with formulas |
-| `docs/sample-files-readme.md` | Documentation for sample CSV files |
-| `docs/ui-testing-strategies.md` | UI testing approaches and strategies |
-| `docs/grist-table-setup.md` | Step-by-step Grist table creation guide |
+| `docs/05-sample-files-readme.md` | Documentation for sample CSV files |
+| `docs/06-ui-testing-strategies.md` | UI testing approaches and strategies |
+| `docs/03-grist-table-setup.md` | Step-by-step Grist table creation guide |
 | `docs/markmap.svg` | Visual project structure diagram |
 | `samples/sample-template-input.csv` | Original template (2 rows) |
 | `samples/sample-minimal-test.csv` | Minimal test file (7 rows) |

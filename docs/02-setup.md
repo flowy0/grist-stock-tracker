@@ -84,7 +84,7 @@ uv run pytest tests/ -v -m "not ui"
 
 ### 8. Create Grist Tables
 
-Follow the table creation guide in `docs/grist-table-setup.md` to create:
+Follow the table creation guide in `docs/03-grist-table-setup.md` to create:
 - `bronze_transactions` - Raw CSV imports
 - `silver_stocks` - Stock master data
 - `silver_transactions` - Validated transactions
