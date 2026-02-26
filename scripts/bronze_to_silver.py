@@ -64,7 +64,7 @@ class BronzeToSilverTransformer:
     def get_bronze_records(self, status: str = "Pending") -> list:
         """Get bronze records with specified validation status."""
         logger.info(f"Fetching bronze records with status: {status}")
-        records = self.grist_api.get_records("bronze_transactions")
+        records = self.grist_api.get_records(self.grist_api.get_actual_table_id("bronze_transactions"))
         
         # Filter by status
         filtered = [
@@ -171,7 +171,7 @@ class BronzeToSilverTransformer:
         symbol, asset_type = self.normalize_symbol(symbol, name)
         
         # Check if stock exists
-        existing_stocks = self.grist_api.get_records("silver_stocks")
+        existing_stocks = self.grist_api.get_records(self.grist_api.get_actual_table_id("silver_stocks"))
         for stock in existing_stocks:
             if stock.get("fields", {}).get("Symbol", "").upper() == symbol:
                 logger.debug(f"Stock already exists: {symbol}")
@@ -191,7 +191,7 @@ class BronzeToSilverTransformer:
         }
 
         try:
-            self.grist_api.add_records("silver_stocks", [stock_record])
+            self.grist_api.add_records(self.grist_api.get_actual_table_id("silver_stocks"), [stock_record])
             self.stats["stocks_created"] += 1
             logger.info(f"Created new stock: {symbol} ({asset_type})")
         except Exception as e:
@@ -252,7 +252,7 @@ class BronzeToSilverTransformer:
             return
 
         # Get existing silver records for duplicate checking
-        existing_silver = self.grist_api.get_records("silver_transactions")
+        existing_silver = self.grist_api.get_records(self.grist_api.get_actual_table_id("silver_transactions"))
 
         silver_records_to_create = []
 
@@ -305,7 +305,7 @@ class BronzeToSilverTransformer:
         # Bulk insert silver records
         if silver_records_to_create and not dry_run:
             try:
-                self.grist_api.add_records("silver_transactions", silver_records_to_create)
+                self.grist_api.add_records(self.grist_api.get_actual_table_id("silver_transactions"), silver_records_to_create)
                 self.stats["silver_created"] = len(silver_records_to_create)
                 logger.info(f"Created {len(silver_records_to_create)} silver records")
             except Exception as e:
