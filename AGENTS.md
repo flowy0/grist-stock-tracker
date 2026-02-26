@@ -476,6 +476,26 @@ docker-compose exec backup backup
 - Volume mounts work the same way as Docker
 - All `docker` commands in this guide are executed via the `docker=podman` alias
 
+### Troubleshooting Podman
+
+**Error: `Cannot connect to Podman`** or **Error: `podman machine not running`**
+
+On macOS, Podman requires a virtual machine to be running:
+
+```bash
+# Start the Podman machine
+podman machine start
+
+# Check machine status
+podman machine list
+
+# If no machine exists, create one
+podman machine init
+podman machine start
+```
+
+After starting the machine, re-run your docker-compose commands.
+
 ## Environment Configuration
 
 Copy `.env.example` to `docker/.env` and configure:
