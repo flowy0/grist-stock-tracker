@@ -6,14 +6,14 @@ Fetches live stock prices from Yahoo Finance and updates silver_stocks table.
 Supports fallback to Alpha Vantage and Finnhub APIs.
 
 Usage:
-    uv run python price_updater.py [--symbols SYMBOLS] [--doc-id <id>]
-    uv run python price_updater.py --symbols AAPL,NVDA,TSLA
-    uv run python price_updater.py --all
+    uv run python price_updater.py [--env <env>]
+    uv run python price_updater.py --symbols AAPL,NVDA,TSLA --env dev
+    uv run python price_updater.py --all --env test
 
 Environment Variables:
-    GRIST_DOC_ID: Grist document ID
-    GRIST_API_KEY: Grist API key
-    GRIST_API_URL: Grist API URL (default: http://localhost:8484/api)
+    ENVIRONMENT: Current environment (dev | test | production)
+    GRIST_API_KEY / TEST_GRIST_API_KEY / PROD_GRIST_API_KEY
+    GRIST_DOC_ID / TEST_GRIST_DOC_ID / PROD_GRIST_DOC_ID
     ALPHAVANTAGE_API_KEY: Alpha Vantage API key (optional)
     FINNHUB_API_KEY: Finnhub API key (optional)
 """
@@ -28,11 +28,12 @@ from datetime import datetime
 from typing import Optional
 
 import requests
-from dotenv import load_dotenv
 
 from csv_import_helper import GristAPI
+from config import Config, get_config
 
 # Load environment variables
+from dotenv import load_dotenv
 load_dotenv()
 
 # Configure logging
@@ -223,7 +224,8 @@ class PriceUpdater:
     def get_stocks(self, symbols: Optional[list] = None, active_only: bool = True) -> list:
         """Get stocks from silver_stocks table."""
         logger.info("Fetching stocks from silver_stocks")
-        records = self.grist_api.get_records("silver_stocks")
+        table_id = self.grist_api.get_actual_table_id("silver_stocks")
+        records = self.grist_api.get_records(table_id)
         
         stocks = []
         for record in records:
@@ -420,7 +422,7 @@ Examples:
 
     # Initialize and run updater
     try:
-        grist_api = GristAPI(args.api_url, args.api_key, args.doc_id)
+        grist_api = GristAPI(api_url, api_key, doc_id)
         updater = PriceUpdater(grist_api)
         updater.update_prices(symbols=symbols, dry_run=args.dry_run)
     except Exception as e:

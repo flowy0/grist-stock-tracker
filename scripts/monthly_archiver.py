@@ -6,14 +6,14 @@ Creates month-end snapshots of portfolio positions for historical tracking.
 Archives data to gold_monthly_archive table.
 
 Usage:
-    uv run python monthly_archiver.py [--month YYYY-MM] [--doc-id <id>]
-    uv run python monthly_archiver.py --month 2026-01
-    uv run python monthly_archiver.py --latest
+    uv run python monthly_archiver.py [--env <env>]
+    uv run python monthly_archiver.py --month 2026-01 --env dev
+    uv run python monthly_archiver.py --latest --env test
 
 Environment Variables:
-    GRIST_DOC_ID: Grist document ID
-    GRIST_API_KEY: Grist API key
-    GRIST_API_URL: Grist API URL (default: http://localhost:8484/api)
+    ENVIRONMENT: Current environment (dev | test | production)
+    GRIST_API_KEY / TEST_GRIST_API_KEY / PROD_GRIST_API_KEY
+    GRIST_DOC_ID / TEST_GRIST_DOC_ID / PROD_GRIST_DOC_ID
 """
 
 import argparse
@@ -25,11 +25,11 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Optional
 
-from dotenv import load_dotenv
-
 from csv_import_helper import GristAPI
+from config import Config, get_config
 
 # Load environment variables
+from dotenv import load_dotenv
 load_dotenv()
 
 # Configure logging
@@ -65,7 +65,7 @@ class MonthlyArchiver:
         you'd need to filter silver_transactions by date.
         """
         logger.info(f"Fetching positions as of {as_of_date.date()}")
-        records = self.grist_api.get_records("gold_positions")
+        records = self.grist_api.get_records(self.grist_api.get_actual_table_id("gold_positions"))
         
         positions = []
         for record in records:
@@ -93,7 +93,7 @@ class MonthlyArchiver:
     def get_transactions_for_month(self, year: int, month: int) -> list:
         """Get all transactions for a specific month to calculate realized P/L."""
         logger.info(f"Fetching transactions for {year}-{month:02d}")
-        records = self.grist_api.get_records("silver_transactions")
+        records = self.grist_api.get_records(self.grist_api.get_actual_table_id("silver_transactions"))
         
         # Filter by month
         month_start = datetime(year, month, 1)
@@ -141,7 +141,7 @@ class MonthlyArchiver:
 
     def check_existing_archive(self, year: int, month: int) -> bool:
         """Check if archive already exists for the month."""
-        records = self.grist_api.get_records("gold_monthly_archive")
+        records = self.grist_api.get_records(self.grist_api.get_actual_table_id("gold_monthly_archive"))
         
         for record in records:
             fields = record.get("fields", {})
@@ -247,7 +247,7 @@ class MonthlyArchiver:
                 logger.info(f"  ... and {len(archive_records) - 3} more")
         else:
             try:
-                self.grist_api.add_records("gold_monthly_archive", archive_records)
+                self.grist_api.add_records(self.grist_api.get_actual_table_id("gold_monthly_archive"), archive_records)
                 self.stats["archived"] = len(archive_records)
                 logger.info(f"Successfully archived {len(archive_records)} positions")
             except Exception as e:
@@ -335,7 +335,7 @@ Examples:
 
     # Initialize and run archiver
     try:
-        grist_api = GristAPI(args.api_url, args.api_key, args.doc_id)
+        grist_api = GristAPI(api_url, api_key, doc_id)
         archiver = MonthlyArchiver(grist_api)
         archiver.run_archival(year=year, month=month, dry_run=args.dry_run)
     except Exception as e:
