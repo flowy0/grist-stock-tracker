@@ -25,7 +25,20 @@ cd grist-stock-tracker
 cp .env.example .env
 
 # Edit .env with your settings
-# Minimal required: GRIST_API_KEY (generate in Grist UI after first run)
+# Set your environment: development | test | production
+ENVIRONMENT=development
+
+# For development (default on port 8484)
+GRIST_API_KEY=your_api_key
+GRIST_DOC_ID=your_doc_id
+
+# For test environment (port 8485)
+TEST_GRIST_API_KEY=your_test_api_key
+TEST_GRIST_DOC_ID=your_test_doc_id
+
+# For production environment (port 8484)
+PROD_GRIST_API_KEY=your_prod_api_key
+PROD_GRIST_DOC_ID=your_prod_doc_id
 ```
 
 ### 3. Start Podman Machine (macOS)
@@ -80,6 +93,48 @@ uv run playwright install chromium
 uv run pytest tests/ -v -m "not ui"
 
 # Expected: 32 tests passing, 2 skipped
+```
+
+## Environment Management
+
+The project supports three isolated environments:
+
+| Environment | Port | Data Directory | Use Case |
+|-------------|------|----------------|----------|
+| `development` | 8484 | `./grist-data` | Daily development |
+| `test` | 8485 | `./grist-data-test` | Testing, experiments |
+| `production` | 8484 | `./grist-data-prod` | Live data |
+
+### Switching Environments
+
+```bash
+cd scripts
+
+# Check current environment
+uv run python manage_env.py status
+
+# Switch to test environment
+uv run python manage_env.py switch test
+
+# Start test environment (different port)
+uv run python manage_env.py start test
+
+# Switch back to development
+uv run python manage_env.py switch development
+uv run python manage_env.py start
+```
+
+### Using Different Environments in Scripts
+
+```bash
+# Import to test environment
+uv run python csv_import_helper.py data.csv --env test
+
+# Update prices in production
+uv run python price_updater.py --env production
+
+# Run transformation in development (default)
+uv run python bronze_to_silver.py
 ```
 
 ### 8. Create Grist Tables

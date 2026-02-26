@@ -6,13 +6,18 @@ This script imports moomoo CSV export files into the bronze_transactions table
 in Grist. It stores raw data without modification (Medallion Architecture - Bronze layer).
 
 Usage:
-    uv run python csv_import_helper.py <csv_file> [--doc-id <id>] [--api-key <key>]
+    uv run python csv_import_helper.py <csv_file> [--doc-id <id>] [--api-key <key>] [--env <env>]
     uv run python csv_import_helper.py samples/sample-minimal-test.csv
+    uv run python csv_import_helper.py samples/test.csv --env test
 
 Environment Variables:
-    GRIST_DOC_ID: Grist document ID
-    GRIST_API_KEY: Grist API key
-    GRIST_API_URL: Grist API URL (default: http://localhost:8484/api)
+    ENVIRONMENT: Current environment (development | test | production)
+    GRIST_DOC_ID: Grist document ID (development)
+    GRIST_API_KEY: Grist API key (development)
+    TEST_GRIST_DOC_ID: Grist document ID (test)
+    TEST_GRIST_API_KEY: Grist API key (test)
+    PROD_GRIST_DOC_ID: Grist document ID (production)
+    PROD_GRIST_API_KEY: Grist API key (production)
 """
 
 import argparse
@@ -28,9 +33,11 @@ from typing import Optional
 
 import pandas as pd
 import requests
-from dotenv import load_dotenv
+
+from config import Config, get_config
 
 # Load environment variables from .env file
+from dotenv import load_dotenv
 load_dotenv()
 
 # Configure logging
@@ -223,24 +230,27 @@ def main():
 Examples:
     uv run python csv_import_helper.py samples/sample-minimal-test.csv
     uv run python csv_import_helper.py samples/sample-singapore-stocks.csv --dry-run
-    uv run python csv_import_helper.py samples/sample-us-stocks.csv --doc-id mydoc --api-key mykey
+    uv run python csv_import_helper.py samples/test.csv --env test
+    uv run python csv_import_helper.py samples/data.csv --doc-id mydoc --api-key mykey
         """,
     )
     parser.add_argument("csv_file", help="Path to moomoo CSV export file")
     parser.add_argument(
+        "--env",
+        choices=["development", "test", "production"],
+        help="Environment to use (overrides ENVIRONMENT variable)",
+    )
+    parser.add_argument(
         "--doc-id",
-        default=os.getenv("GRIST_DOC_ID"),
-        help="Grist document ID (or set GRIST_DOC_ID env var)",
+        help="Grist document ID (overrides environment config)",
     )
     parser.add_argument(
         "--api-key",
-        default=os.getenv("GRIST_API_KEY"),
-        help="Grist API key (or set GRIST_API_KEY env var)",
+        help="Grist API key (overrides environment config)",
     )
     parser.add_argument(
         "--api-url",
-        default=os.getenv("GRIST_API_URL", "http://localhost:8484/api"),
-        help="Grist API URL (default: http://localhost:8484/api)",
+        help="Grist API URL (overrides environment config)",
     )
     parser.add_argument(
         "--dry-run",
@@ -250,18 +260,38 @@ Examples:
 
     args = parser.parse_args()
 
+    # Get configuration for environment
+    config = get_config(args.env)
+    
+    # Command line args override config
+    api_url = args.api_url or f"{config.url}/api"
+    api_key = args.api_key or config.api_key
+    doc_id = args.doc_id or config.doc_id
+
     # Validate required arguments
-    if not args.doc_id:
-        logger.error("Grist document ID is required. Set GRIST_DOC_ID or use --doc-id")
+    if not doc_id:
+        logger.error(
+            "Grist document ID is required. "
+            "Set GRIST_DOC_ID / TEST_GRIST_DOC_ID / PROD_GRIST_DOC_ID "
+            "or use --doc-id"
+        )
         sys.exit(1)
 
-    if not args.api_key:
-        logger.error("Grist API key is required. Set GRIST_API_KEY or use --api-key")
+    if not api_key:
+        logger.error(
+            "Grist API key is required. "
+            "Set GRIST_API_KEY / TEST_GRIST_API_KEY / PROD_GRIST_API_KEY "
+            "or use --api-key"
+        )
         sys.exit(1)
+
+    env_display = args.env or Config.ENVIRONMENT
+    logger.info(f"Using environment: {env_display}")
+    logger.info(f"Grist URL: {config.url}")
 
     # Initialize Grist API and importer
     try:
-        grist_api = GristAPI(args.api_url, args.api_key, args.doc_id)
+        grist_api = GristAPI(api_url, api_key, doc_id)
         importer = CSVImporter(grist_api)
         
         # Import CSV

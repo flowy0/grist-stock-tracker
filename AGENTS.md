@@ -639,6 +639,90 @@ The project supports importing from moomoo export format. See `docs/05-sample-fi
 4. Valid records are transformed and inserted into silver_transactions
 5. silver_stocks is updated with new symbols if needed
 
+## Environment Management
+
+The project supports three environments with isolated data and configurations:
+
+| Environment | Port | Data Directory | Purpose |
+|-------------|------|----------------|---------|
+| `development` | 8484 | `./grist-data` | Local development |
+| `test` | 8485 | `./grist-data-test` | Testing and CI/CD |
+| `production` | 8484 | `./grist-data-prod` | Production deployment |
+
+### Configuration
+
+Set environment via `ENVIRONMENT` variable in `.env`:
+```bash
+ENVIRONMENT=development  # or test, production
+```
+
+Environment-specific variables:
+```bash
+# Development
+GRIST_URL=http://localhost:8484
+GRIST_API_KEY=dev_key
+GRIST_DOC_ID=dev_doc
+
+# Test
+TEST_GRIST_URL=http://localhost:8485
+TEST_GRIST_API_KEY=test_key
+TEST_GRIST_DOC_ID=test_doc
+
+# Production
+PROD_GRIST_URL=http://localhost:8484
+PROD_GRIST_API_KEY=prod_key
+PROD_GRIST_DOC_ID=prod_doc
+```
+
+### Environment Management Commands
+
+```bash
+# Check current environment status
+cd scripts && uv run python manage_env.py status
+
+# Switch environment (updates .env file)
+uv run python manage_env.py switch test
+
+# Start current environment
+uv run python manage_env.py start
+
+# Start specific environment
+uv run python manage_env.py start test
+
+# Stop environment
+uv run python manage_env.py stop
+
+# View logs
+uv run python manage_env.py logs -f
+```
+
+### Script Usage with Environments
+
+All scripts support `--env` flag to override the default:
+
+```bash
+# Use test environment for import
+uv run python csv_import_helper.py data.csv --env test
+
+# Use production environment
+uv run python bronze_to_silver.py --env production
+
+# Override specific config values
+uv run python price_updater.py --env test --doc-id override_doc
+```
+
+### Docker Compose for Test Environment
+
+Test environment uses an override file for different port and data directory:
+
+```bash
+# Start test environment
+docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d
+
+# Or use the management script
+uv run python manage_env.py start test
+```
+
 ## Testing Strategy
 
 Currently, this project relies on:
