@@ -1,5 +1,5 @@
 # Grist Stock Tracker - Test Environment Configuration
-# Usage: docker compose -f docker-compose.yml -f docker compose.test.yml up -d
+# Usage: docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
 
 version: '3.8'
 
@@ -9,7 +9,7 @@ services:
     ports:
       - "8485:8484"  # Different port for test environment
     volumes:
-      - ./grist-data-test:/persist  # Separate test data directory
+      - ./grist-data/test:/persist  # Separate test data directory
     environment:
       - GRIST_SINGLE_ORG=stock-tracker-test
       - GRIST_DEFAULT_EMAIL=admin-test@localhost

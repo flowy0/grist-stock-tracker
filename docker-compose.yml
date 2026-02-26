@@ -21,7 +21,7 @@ services:
       - GRIST_SESSION_SECRET=${GRIST_SESSION_SECRET:-changeme-in-production}
       - GRIST_TELEMETRY_LEVEL=off
     volumes:
-      - ${GRIST_DATA_DIR:-./grist-data}:/persist
+      - ${GRIST_DATA_DIR:-./grist-data/dev}:/persist
       - ./backups:/persist/backups
     networks:
       - grist-network

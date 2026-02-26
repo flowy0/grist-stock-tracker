@@ -58,9 +58,9 @@ def show_status():
     # Show data directories
     print("\nData directories:")
     for name, path in [
-        ("dev", PROJECT_ROOT / "grist-data"),
-        ("test", PROJECT_ROOT / "grist-data-test"),
-        ("production", PROJECT_ROOT / "grist-data-prod"),
+        ("dev", PROJECT_ROOT / "grist-data" / "dev"),
+        ("test", PROJECT_ROOT / "grist-data" / "test"),
+        ("production", PROJECT_ROOT / "grist-data" / "prod"),
     ]:
         size = "N/A"
         if path.exists():
@@ -89,7 +89,7 @@ def start_environment(env: str = None):
         print(f"\nTest environment started on http://localhost:8485")
     else:
         # Development or production
-        data_dir = f"./grist-data{'-prod' if env == 'production' else ''}"
+        data_dir = f"./grist-data/{'prod' if env == 'production' else 'dev'}"
         env_vars = os.environ.copy()
         env_vars["GRIST_DATA_DIR"] = data_dir
 

@@ -101,7 +101,11 @@ grist-stock-tracker/
 │       └── ui/                 # UI tests (Playwright)
 ├── templates/                  # Grist templates (.grist files)
 ├── grist-data/                 # Persisted Grist data (created at runtime)
-└── backups/                    # Backup archives (created at runtime)
+│   ├── dev/                    # Development environment data
+│   ├── test/                   # Test environment data
+│   ├── prod/                   # Production environment data
+│   └── backups/                # Backup archives (shared)
+└── templates/                  # Grist templates (.grist files)
 ```
 
 ## Architecture
@@ -112,7 +116,7 @@ grist-stock-tracker/
    - Image: `gristlabs/grist:latest`
    - Port: `8484`
    - Volumes:
-     - `./grist-data:/persist` - Persistent data
+     - `./grist-data/dev:/persist` - Persistent data (dev environment)
      - `./scripts:/persist/scripts:ro` - Read-only automation scripts
      - `./templates:/persist/templates:ro` - Read-only templates
      - `./backups:/persist/backups` - Backup storage
@@ -644,9 +648,9 @@ The project supports three environments with isolated data and configurations:
 
 | Environment | Port | Data Directory | Purpose |
 |-------------|------|----------------|---------|
-| `dev` | 8484 | `./grist-data` | Local development |
-| `test` | 8485 | `./grist-data-test` | Testing and CI/CD |
-| `production` | 8484 | `./grist-data-prod` | Production deployment |
+| `dev` | 8484 | `./grist-data/dev` | Local development |
+| `test` | 8485 | `./grist-data/test` | Testing and CI/CD |
+| `production` | 8484 | `./grist-data/prod` | Production deployment |
 
 ### Configuration
 

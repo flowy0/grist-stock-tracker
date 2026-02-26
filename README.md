@@ -82,7 +82,10 @@ grist-stock-tracker/
 │   └── tests/
 ├── samples/              # Sample CSV files
 ├── grist-data/           # Grist persistent data
-└── backups/              # Backup storage
+│   ├── dev/              # Development environment
+│   ├── test/             # Test environment
+│   ├── prod/             # Production environment
+│   └── backups/          # Backup storage
 ```
 
 ## Sample Data

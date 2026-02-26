@@ -124,9 +124,32 @@ The project supports three isolated environments, each with separate data direct
 
 | Environment | Port | Data Directory | Config Variables | Use Case |
 |-------------|------|----------------|------------------|----------|
-| `dev` | 8484 | `./grist-data` | `GRIST_API_KEY`, `GRIST_DOC_ID` | Daily development |
-| `test` | 8485 | `./grist-data-test` | `TEST_GRIST_API_KEY`, `TEST_GRIST_DOC_ID` | Testing, experiments |
-| `production` | 8484 | `./grist-data-prod` | `PROD_GRIST_API_KEY`, `PROD_GRIST_DOC_ID` | Live data |
+| `dev` | 8484 | `./grist-data/dev` | `GRIST_API_KEY`, `GRIST_DOC_ID` | Daily development |
+| `test` | 8485 | `./grist-data/test` | `TEST_GRIST_API_KEY`, `TEST_GRIST_DOC_ID` | Testing, experiments |
+| `production` | 8484 | `./grist-data/prod` | `PROD_GRIST_API_KEY`, `PROD_GRIST_DOC_ID` | Live data |
+
+### Data Directory Structure
+
+All environment data is organized under the `grist-data/` folder:
+
+```
+grist-data/
+├── dev/          # Development environment data
+│   └── ...
+├── test/         # Test environment data (isolated)
+│   └── ...
+├── prod/         # Production environment data (live)
+│   └── ...
+└── backups/      # Backup archives (shared across environments)
+    └── ...
+```
+
+**Key points:**
+- Each environment has completely isolated data - switching environments means switching databases
+- `dev` is the default for daily development work
+- `test` is useful for testing imports or experiments without affecting real data
+- `prod` should only be used for live production data
+- Backups are stored in a shared `backups/` folder regardless of environment
 
 ### How Environment Variables Work
 
@@ -280,7 +303,10 @@ grist-stock-tracker/
 │   ├── tests/                  # Test suite
 │   └── .venv/                  # Virtual environment
 ├── grist-data/                 # Grist persistent data
-└── backups/                    # Backup storage
+│   ├── dev/                    # Development environment
+│   ├── test/                   # Test environment
+│   ├── prod/                   # Production environment
+│   └── backups/                # Backup archives
 ```
 
 ### Adding Dependencies
