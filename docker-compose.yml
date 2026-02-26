@@ -1,0 +1,71 @@
+# Grist Stock Tracker - Docker/Podman Compose Configuration
+# Compatible with both Docker and Podman (using docker=podman alias)
+
+version: '3.8'
+
+services:
+  grist:
+    image: gristlabs/grist:latest
+    container_name: grist-stock-tracker
+    restart: unless-stopped
+    ports:
+      - "8484:8484"
+    environment:
+      - GRIST_SINGLE_ORG=stock-tracker
+      - GRIST_DEFAULT_EMAIL=admin@localhost
+      - GRIST_SUPPORT_ANON=false
+      - GRIST_LOGIN_REQUIRED=true
+      - GRIST_FORCE_LOGIN=true
+      - GRIST_SANDBOX_FLAVOR=gvisor
+      - GRIST_DATA_DIR=/persist
+      - GRIST_SESSION_SECRET=${GRIST_SESSION_SECRET:-changeme-in-production}
+      - GRIST_TELEMETRY_LEVEL=off
+    volumes:
+      - ./grist-data:/persist
+      - ./scripts:/persist/scripts:ro
+      - ./templates:/persist/templates:ro
+      - ./backups:/persist/backups
+    networks:
+      - grist-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: grist-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=grist
+      - POSTGRES_USER=grist
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-gristpassword}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - grist-network
+    profiles:
+      - postgres
+
+  backup:
+    image: offen/docker-volume-backup:latest
+    container_name: grist-backup
+    restart: unless-stopped
+    environment:
+      - BACKUP_CRON_EXPRESSION=0 2 * * *
+      - BACKUP_RETENTION_DAYS=30
+      - BACKUP_FILENAME=grist-backup-%Y-%m-%dT%H-%M-%S.tar.gz
+      - BACKUP_ARCHIVE=/archive
+      - AWS_S3_BUCKET_NAME=${S3_BUCKET:-}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY:-}
+      - AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
+    volumes:
+      - ./grist-data:/backup/grist-data:ro
+      - ./backups:/archive
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    profiles:
+      - backup
+
+volumes:
+  postgres-data:
+
+networks:
+  grist-network:
+    driver: bridge

@@ -1,0 +1,17 @@
+Generate a complete Grist Stock Tracker project with:
+
+1. Docker Compose setup with Grist, optional PostgreSQL, and backup service
+2. Python scripts:
+   - csv_import_helper.py: Transform moomoo CSV to Grist format
+   - price_updater.py: Fetch prices from Yahoo Finance/Alpha Vantage/Finnhub
+3. Documentation:
+   - SETUP_GUIDE.md: How to configure Grist tables and formulas
+   - GRIST_FORMULAS.md: All Python formulas for P/L calculations
+   - API_SETUP.md: Price API setup
+   - CSV_IMPORT.md: Import workflow
+   - BACKUP_RESTORE.md: Backup procedures
+4. Makefile with common commands
+5. requirements.txt for Python deps
+6. README.md with quick start
+
+Use the formulas and data structure from project-spec.md.
