@@ -17,15 +17,42 @@ A self-hosted stock portfolio tracking application built on Grist, featuring spr
 
 | Document | Description |
 |----------|-------------|
+| `docs/SETUP.md` | **Complete setup guide** - Start here! |
 | `AGENTS.md` | Complete technical guide for development |
-| `docs/implementation-todo.md` | Step-by-step implementation checklist |
+| `docs/grist-table-setup.md` | Step-by-step Grist table creation |
 | `docs/sample-files-readme.md` | Documentation for sample CSV files |
 | `docs/01-project-spec.md` | Detailed project specification |
 | `.kimi/README.md` | Kimi Code agent configuration guide |
 
+## Quick Start
+
+```bash
+# 1. Clone repository
+git clone https://github.com/flowy0/grist-stock-tracker.git
+cd grist-stock-tracker
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# 3. Start Podman (macOS)
+podman machine start
+
+# 4. Start Grist
+docker-compose up -d grist
+
+# 5. Setup Python environment
+cd scripts && uv sync
+
+# 6. Run tests
+uv run pytest tests/ -v -m "not ui"
+```
+
+**Full setup instructions**: See [`docs/SETUP.md`](docs/SETUP.md)
+
 ## Development with Kimi Code
 
-This project includes a custom Kimi Code agent configuration for optimized development:
+This project includes a custom Kimi Code agent configuration:
 
 ```bash
 # Start Kimi with the project-specific developer agent
@@ -38,33 +65,34 @@ kimi --agent-file .kimi/agent.yaml
 - **tester** - Test generation specialist  
 - **git** - Git workflow specialist (branch/PR management)
 
-### Security Features
+See `.kimi/README.md` for detailed configuration.
 
-- File access restricted to project directory only
-- All file writes require user approval
-- Subagents run in isolated contexts
+## Project Structure
 
-See `.kimi/README.md` for detailed configuration options.
+```
+grist-stock-tracker/
+├── docker-compose.yml     # Container orchestration
+├── docs/                  # Documentation
+│   └── SETUP.md          # Complete setup guide
+├── scripts/              # Python automation
+│   ├── csv_import_helper.py
+│   ├── bronze_to_silver.py
+│   ├── price_updater.py
+│   ├── monthly_archiver.py
+│   └── tests/
+├── samples/              # Sample CSV files
+├── grist-data/           # Grist persistent data
+└── backups/              # Backup storage
+```
 
 ## Sample Data
 
-Test files are provided in the `samples/` folder:
+Test files provided in `samples/`:
 - `sample-minimal-test.csv` - Quick validation (7 transactions)
 - `sample-singapore-stocks.csv` - Singapore market data (14 transactions)
 - `sample-us-stocks.csv` - US market data (17 transactions)
 - `sample-mixed-portfolio.csv` - Realistic portfolio (22 transactions)
 
-## Quick Start
+## License
 
-### Prerequisites
-
-- Podman (with docker alias) or Docker installed
-- Podman Compose or Docker Compose
-- 2GB RAM minimum, 4GB recommended
-
-### 1. Clone and Configure
-
-```bash
-cd grist-stock-tracker
-cp docker/.env.example docker/.env
-# Edit docker/.env with your settings
+MIT License - See repository for details.
