@@ -685,6 +685,8 @@ When using a reverse proxy, ensure WebSocket support is enabled (required for Gr
 | `.env.example` | Configuration template |
 | `docs/01-project-spec.md` | Detailed specification with formulas |
 | `docs/sample-files-readme.md` | Documentation for sample CSV files |
+| `docs/ui-testing-strategies.md` | UI testing approaches and strategies |
+| `docs/grist-table-setup.md` | Step-by-step Grist table creation guide |
 | `docs/markmap.svg` | Visual project structure diagram |
 | `samples/sample-template-input.csv` | Original template (2 rows) |
 | `samples/sample-minimal-test.csv` | Minimal test file (7 rows) |
