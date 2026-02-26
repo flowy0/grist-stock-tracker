@@ -69,6 +69,56 @@ You have access to all development tools:
 - **Task**: Spawn subagents for parallel work
 - **Todo**: SetTodoList for task tracking
 
+## Git Workflow
+
+This project uses a feature branch workflow:
+
+```
+feature/my-feature  →  dev  →  main
+     (your work)    (integration)  (production)
+```
+
+### Typical Workflow
+
+1. **Start from dev branch:**
+   ```bash
+   git checkout dev
+   git pull origin dev
+   ```
+
+2. **Create feature branch:**
+   ```bash
+   git checkout -b feature/description
+   ```
+
+3. **Make changes and commit:**
+   ```bash
+   git add <files>
+   git commit -m "feat: description"
+   ```
+
+4. **Push and create PR:**
+   ```bash
+   git push -u origin feature/description
+   gh pr create --title "feat: description" --body "..." --base dev
+   ```
+
+### Commit Message Format
+
+- `feat:` - New feature
+- `fix:` - Bug fix  
+- `docs:` - Documentation changes
+- `refactor:` - Code refactoring
+- `test:` - Adding tests
+- `chore:` - Maintenance tasks
+
+### Subagents for Git Operations
+
+Use the **git** subagent for complex branch/PR operations:
+```
+Please use the git subagent to create a feature branch for the CSV import script
+```
+
 ## Current Time
 
 ${KIMI_NOW}
