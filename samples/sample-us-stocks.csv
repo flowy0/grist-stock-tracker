@@ -1,0 +1,17 @@
+Side,Symbol,Name,Order Price,Order Qty,Order Amount,Status,Filled@Avg Price,Order Time,Order Type,Time-in-Force,Allow Pre-Market,Session,Trigger price,Position Opening,Markets,Currency,Order Source,Fill Qty,Fill Price,Fill Amount,Fill Time,Markets,Currency,Counterparty,Remarks,Platform Fees,Consumption Tax,Settlement Fees,Trading Activity Fees,Consolidated Audit Trail Fees,Commission,Trading Fees,Clearing Fees,Total
+Buy,AAPL,Apple Inc.,195.50,10,1955.00,Filled,10@195.45,"Jan 10, 2026 10:30:00 ET",Limit,Day,,,,,US,USD,,10,195.45,1954.50,"Jan 10, 2026 10:35:15 ET",US,USD,,,0.99,0.17,0.01,0.01,0,0.99,,,2.17
+Buy,NVDA,NVIDIA Corporation,875.25,5,4376.25,Filled,5@875.00,"Jan 12, 2026 11:00:00 ET",Limit,Day,,,,,US,USD,,5,875.00,4375.00,"Jan 12, 2026 11:05:30 ET",US,USD,,,0.99,0.38,0.01,0.01,0,0.99,,,2.38
+Buy,MSFT,Microsoft Corporation,420.00,8,3360.00,Filled,8@419.85,"Jan 18, 2026 09:45:00 ET",Limit,Day,,,,,US,USD,,8,419.85,3358.80,"Jan 18, 2026 09:50:20 ET",US,USD,,,0.99,0.29,0.01,0.01,0,0.99,,,2.29
+Buy,AMD,Advanced Micro Devices,175.50,20,3510.00,Filled,20@175.25,"Dec 15, 2025 14:20:00 ET",Limit,Day,,,,,US,USD,,20,175.25,3505.00,"Dec 15, 2025 14:25:10 ET",US,USD,,,0.99,0.30,0.01,0.01,0,0.99,,,2.30
+Buy,TSLA,Tesla Inc.,245.00,15,3675.00,Filled,15@244.80,"Nov 20, 2025 10:15:00 ET",Limit,Day,,,,,US,USD,,15,244.80,3672.00,"Nov 20, 2025 10:20:45 ET",US,USD,,,0.99,0.32,0.01,0.01,0,0.99,,,2.32
+Buy,GOOGL,Alphabet Inc. Class A,165.75,12,1989.00,Filled,12@165.60,"Oct 25, 2025 11:30:00 ET",Limit,Day,,,,,US,USD,,12,165.60,1987.20,"Oct 25, 2025 11:35:15 ET",US,USD,,,0.99,0.17,0.01,0.01,0,0.99,,,2.17
+Buy,AMZN,Amazon.com Inc.,185.00,10,1850.00,Filled,10@184.90,"Sep 18, 2025 13:45:00 ET",Limit,Day,,,,,US,USD,,10,184.90,1849.00,"Sep 18, 2025 13:50:30 ET",US,USD,,,0.99,0.16,0.01,0.01,0,0.99,,,2.16
+Buy,VOO,Vanguard S&P 500 ETF,485.50,4,1942.00,Filled,4@485.25,"Aug 22, 2025 10:00:00 ET",Limit,Day,,,,,US,USD,,4,485.25,1941.00,"Aug 22, 2025 10:05:00 ET",US,USD,,,0.99,0.17,0.01,0.01,0,0.99,,,2.17
+Sell,NVDA,NVIDIA Corporation,920.00,2,1840.00,Filled,2@922.50,"Feb 5, 2026 14:30:00 ET",Limit,Day,,,,,US,USD,,2,922.50,1845.00,"Feb 5, 2026 14:35:20 ET",US,USD,,,0.99,0.16,0.01,0.01,0,0.99,,,2.16
+Sell,TSLA,Tesla Inc.,285.00,5,1425.00,Filled,5@287.00,"Jan 25, 2026 11:15:00 ET",Limit,Day,,,,,US,USD,,5,287.00,1435.00,"Jan 25, 2026 11:20:45 ET",US,USD,,,0.99,0.12,0.01,0.01,0,0.99,,,2.12
+Buy,QQQ,Invesco QQQ Trust,440.00,5,2200.00,Filled,5@439.75,"Dec 8, 2025 09:30:00 ET",Limit,Day,,,,,US,USD,,5,439.75,2198.75,"Dec 8, 2025 09:35:10 ET",US,USD,,,0.99,0.19,0.01,0.01,0,0.99,,,2.19
+Buy,INTC,Intel Corporation,22.50,100,2250.00,Filled,100@22.45,"Nov 15, 2025 15:00:00 ET",Limit,Day,,,,,US,USD,,100,22.45,2245.00,"Nov 15, 2025 15:05:30 ET",US,USD,,,0.99,0.19,0.01,0.01,0,0.99,,,2.19
+Buy,JPM,JPMorgan Chase & Co.,220.00,6,1320.00,Filled,6@219.85,"Oct 30, 2025 10:45:00 ET",Limit,Day,,,,,US,USD,,6,219.85,1319.10,"Oct 30, 2025 10:50:15 ET",US,USD,,,0.99,0.11,0.01,0.01,0,0.99,,,2.11
+Dividend,AAPL,Apple Inc.,0,0,5.50,Filled,,"Feb 10, 2026 00:00:00 ET",Dividend,,,,,,US,USD,,0,0,5.50,"Feb 10, 2026 00:00:00 ET",US,USD,,,,,,,,,,,0.00
+Dividend,VOO,Vanguard S&P 500 ETF,0,0,12.80,Filled,,"Mar 15, 2026 00:00:00 ET",Dividend,,,,,,US,USD,,0,0,12.80,"Mar 15, 2026 00:00:00 ET",US,USD,,,,,,,,,,,0.00
+Dividend,JPM,JPMorgan Chase & Co.,0,0,25.00,Filled,,"Jan 31, 2026 00:00:00 ET",Dividend,,,,,,US,USD,,0,0,25.00,"Jan 31, 2026 00:00:00 ET",US,USD,,,,,,,,,,,0.00

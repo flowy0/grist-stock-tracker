@@ -1,0 +1,21 @@
+Side,Symbol,Name,Order Price,Order Qty,Order Amount,Status,Filled@Avg Price,Order Time,Order Type,Time-in-Force,Allow Pre-Market,Session,Trigger price,Position Opening,Markets,Currency,Order Source,Fill Qty,Fill Price,Fill Amount,Fill Time,Markets,Currency,Counterparty,Remarks,Platform Fees,Consumption Tax,Settlement Fees,Trading Activity Fees,Consolidated Audit Trail Fees,Commission,Trading Fees,Clearing Fees,Total
+Buy,D05,DBS Group Holdings Ltd,42.50,100,4250.00,Filled,100@42.48,"Jan 5, 2026 09:30:00 SGT",Limit,Day,,,,,SG,SGD,,100,42.48,4248.00,"Jan 5, 2026 10:15:00 SGT",SG,SGD,,,0.99,0.28,,,,0.99,0.02,0.09,2.37
+Buy,OV8,Sheng Siong Group Ltd,2.92,1000,2920.00,Filled,1000@2.91,"Jan 6, 2026 11:00:00 SGT",Limit,Day,,,,,SG,SGD,,1000,2.91,2910.00,"Jan 6, 2026 12:30:00 SGT",SG,SGD,,,0.99,0.19,,,,0.99,0.02,0.09,2.28
+Buy,AAPL,Apple Inc.,195.50,5,977.50,Filled,5@195.45,"Jan 8, 2026 10:30:00 ET",Limit,Day,,,,,US,USD,,5,195.45,977.25,"Jan 8, 2026 10:35:00 ET",US,USD,,,0.99,0.08,0.01,0.01,0,0.99,,,2.08
+Buy,NVDA,NVIDIA Corporation,875.25,2,1750.50,Filled,2@875.00,"Jan 10, 2026 11:00:00 ET",Limit,Day,,,,,US,USD,,2,875.00,1750.00,"Jan 10, 2026 11:05:00 ET",US,USD,,,0.99,0.15,0.01,0.01,0,0.99,,,2.15
+Buy,Z74,Singtel,4.15,2000,8300.00,Filled,2000@4.14,"Jan 12, 2026 14:20:00 SGT",Limit,Day,,,,,SG,SGD,,2000,4.14,8280.00,"Jan 12, 2026 14:45:00 SGT",SG,SGD,,,0.99,0.55,,,,0.99,0.02,0.09,2.64
+Buy,MSFT,Microsoft Corporation,420.00,4,1680.00,Filled,4@419.85,"Jan 15, 2026 09:45:00 ET",Limit,Day,,,,,US,USD,,4,419.85,1679.40,"Jan 15, 2026 09:50:00 ET",US,USD,,,0.99,0.14,0.01,0.01,0,0.99,,,2.14
+Buy,U11,UOB Ltd,35.20,150,5280.00,Filled,150@35.18,"Jan 18, 2026 10:00:00 SGT",Limit,Day,,,,,SG,SGD,,150,35.18,5277.00,"Jan 18, 2026 10:25:00 SGT",SG,SGD,,,0.99,0.35,,,,0.99,0.02,0.09,2.44
+Dividend,D05,DBS Group Holdings Ltd,0,0,60.00,Filled,,"Jan 31, 2026 00:00:00 SGT",Dividend,,,,,,SG,SGD,,0,0,60.00,"Jan 31, 2026 00:00:00 SGT",SG,SGD,,,,,,,,,,,0.00
+Dividend,AAPL,Apple Inc.,0,0,2.75,Filled,,"Feb 1, 2026 00:00:00 ET",Dividend,,,,,,US,USD,,0,0,2.75,"Feb 1, 2026 00:00:00 ET",US,USD,,,,,,,,,,,0.00
+Sell,NVDA,NVIDIA Corporation,920.00,1,920.00,Filled,1@922.00,"Feb 5, 2026 14:30:00 ET",Limit,Day,,,,,US,USD,,1,922.00,922.00,"Feb 5, 2026 14:35:00 ET",US,USD,,,0.99,0.08,0.01,0.01,0,0.99,,,2.08
+Buy,C38,CapitaLand Integrated Commercial Trust,2.05,2000,4100.00,Filled,2000@2.04,"Feb 8, 2026 11:30:00 SGT",Limit,Day,,,,,SG,SGD,,2000,2.04,4080.00,"Feb 8, 2026 11:55:00 SGT",SG,SGD,,,0.99,0.27,,,,0.99,0.02,0.09,2.36
+Buy,AMD,Advanced Micro Devices,175.50,10,1755.00,Filled,10@175.25,"Feb 10, 2026 13:00:00 ET",Limit,Day,,,,,US,USD,,10,175.25,1752.50,"Feb 10, 2026 13:05:00 ET",US,USD,,,0.99,0.15,0.01,0.01,0,0.99,,,2.15
+Sell,OV8,Sheng Siong Group Ltd,3.05,500,1525.00,Filled,500@3.06,"Feb 15, 2026 10:00:00 SGT",Limit,Day,,,,,SG,SGD,,500,3.06,1530.00,"Feb 15, 2026 10:25:00 SGT",SG,SGD,,,0.99,0.10,,,,0.99,0.02,0.09,2.19
+Dividend,OV8,Sheng Siong Group Ltd,0,0,22.50,Filled,,"Feb 20, 2026 00:00:00 SGT",Dividend,,,,,,SG,SGD,,0,0,22.50,"Feb 20, 2026 00:00:00 SGT",SG,SGD,,,,,,,,,,,0.00
+Buy,VOO,Vanguard S&P 500 ETF,485.50,2,971.00,Filled,2@485.25,"Feb 22, 2026 10:00:00 ET",Limit,Day,,,,,US,USD,,2,485.25,970.50,"Feb 22, 2026 10:05:00 ET",US,USD,,,0.99,0.08,0.01,0.01,0,0.99,,,2.08
+Buy,TSLA,Tesla Inc.,245.00,8,1960.00,Filled,8@244.80,"Feb 25, 2026 11:30:00 ET",Limit,Day,,,,,US,USD,,8,244.80,1958.40,"Feb 25, 2026 11:35:00 ET",US,USD,,,0.99,0.17,0.01,0.01,0,0.99,,,2.17
+Buy,A17U,Ascendas REIT,2.68,1500,4020.00,Filled,1500@2.67,"Mar 1, 2026 09:15:00 SGT",Limit,Day,,,,,SG,SGD,,1500,2.67,4005.00,"Mar 1, 2026 09:40:00 SGT",SG,SGD,,,0.99,0.26,,,,0.99,0.02,0.09,2.35
+Dividend,Z74,Singtel,0,0,85.00,Filled,,"Mar 5, 2026 00:00:00 SGT",Dividend,,,,,,SG,SGD,,0,0,85.00,"Mar 5, 2026 00:00:00 SGT",SG,SGD,,,,,,,,,,,0.00
+Dividend,C38,CapitaLand Integrated Commercial Trust,0,0,48.00,Filled,,"Mar 10, 2026 00:00:00 SGT",Dividend,,,,,,SG,SGD,,0,0,48.00,"Mar 10, 2026 00:00:00 SGT",SG,SGD,,,,,,,,,,,0.00
+Dividend,VOO,Vanguard S&P 500 ETF,0,0,6.40,Filled,,"Mar 15, 2026 00:00:00 ET",Dividend,,,,,,US,USD,,0,0,6.40,"Mar 15, 2026 00:00:00 ET",US,USD,,,,,,,,,,,0.00

@@ -1,0 +1,14 @@
+Side,Symbol,Name,Order Price,Order Qty,Order Amount,Status,Filled@Avg Price,Order Time,Order Type,Time-in-Force,Allow Pre-Market,Session,Trigger price,Position Opening,Markets,Currency,Order Source,Fill Qty,Fill Price,Fill Amount,Fill Time,Markets,Currency,Counterparty,Remarks,Platform Fees,Consumption Tax,Settlement Fees,Trading Activity Fees,Consolidated Audit Trail Fees,Commission,Trading Fees,Clearing Fees,Total
+Buy,OV8,Sheng Siong Group Ltd,2.92,1000,2920.00,Filled,1000@2.91,"Feb 9, 2026 11:00:40 SGT",Limit,Day,,,,,SG,SGD,,1000,2.91,2910.00,"Feb 9, 2026 12:58:43 SGT",SG,SGD,,,0.99,0.19,,,,0.99,0.02,0.09,2.28
+Buy,D05,DBS Group Holdings Ltd,42.50,200,8500.00,Filled,200@42.48,"Jan 15, 2026 09:30:15 SGT",Limit,Day,,,,,SG,SGD,,200,42.48,8496.00,"Jan 15, 2026 10:15:22 SGT",SG,SGD,,,0.99,0.56,,,,0.99,0.02,0.09,2.65
+Buy,U11,UOB Ltd,35.20,300,10560.00,Filled,300@35.18,"Jan 20, 2026 14:20:30 SGT",Limit,Day,,,,,SG,SGD,,300,35.18,10554.00,"Jan 20, 2026 14:45:12 SGT",SG,SGD,,,0.99,0.70,,,,0.99,0.02,0.09,2.79
+Buy,Z74,Singtel,4.15,2000,8300.00,Filled,2000@4.14,"Dec 5, 2025 11:15:00 SGT",Limit,Day,,,,,SG,SGD,,2000,4.14,8280.00,"Dec 5, 2025 11:30:45 SGT",SG,SGD,,,0.99,0.55,,,,0.99,0.02,0.09,2.64
+Buy,C38,CapitaLand Integrated Commercial Trust,2.05,5000,10250.00,Filled,5000@2.04,"Nov 12, 2025 10:00:00 SGT",Limit,Day,,,,,SG,SGD,,5000,2.04,10200.00,"Nov 12, 2025 10:25:30 SGT",SG,SGD,,,0.99,0.68,,,,0.99,0.02,0.09,2.77
+Buy,A17U,Ascendas REIT,2.68,3000,8040.00,Filled,3000@2.67,"Oct 8, 2025 09:45:00 SGT",Limit,Day,,,,,SG,SGD,,3000,2.67,8010.00,"Oct 8, 2025 10:10:15 SGT",SG,SGD,,,0.99,0.53,,,,0.99,0.02,0.09,2.62
+Sell,OV8,Sheng Siong Group Ltd,3.05,500,1525.00,Filled,500@3.06,"Feb 20, 2026 13:30:00 SGT",Limit,Day,,,,,SG,SGD,,500,3.06,1530.00,"Feb 20, 2026 14:15:30 SGT",SG,SGD,,,0.99,0.10,,,,0.99,0.02,0.09,2.19
+Buy,ME8U,Mapletree Industrial Trust,2.35,2000,4700.00,Filled,2000@2.34,"Jan 5, 2026 11:20:00 SGT",Limit,Day,,,,,SG,SGD,,2000,2.34,4680.00,"Jan 5, 2026 11:45:00 SGT",SG,SGD,,,0.99,0.31,,,,0.99,0.02,0.09,2.40
+Buy,CJLU,NetLink NBN Trust,0.98,10000,9800.00,Filled,10000@0.98,"Dec 18, 2025 15:00:00 SGT",Limit,Day,,,,,SG,SGD,,10000,0.98,9800.00,"Dec 18, 2025 15:20:00 SGT",SG,SGD,,,0.99,0.65,,,,0.99,0.02,0.09,2.74
+Buy,RE2S,Frasers Centrepoint Trust,2.55,2500,6375.00,Filled,2500@2.54,"Sep 22, 2025 10:30:00 SGT",Limit,Day,,,,,SG,SGD,,2500,2.54,6350.00,"Sep 22, 2025 11:00:00 SGT",SG,SGD,,,0.99,0.42,,,,0.99,0.02,0.09,2.51
+Buy,CLR,City Developments Ltd,6.80,500,3400.00,Filled,500@6.78,"Aug 14, 2025 14:15:00 SGT",Limit,Day,,,,,SG,SGD,,500,6.78,3390.00,"Aug 14, 2025 14:40:00 SGT",SG,SGD,,,0.99,0.22,,,,0.99,0.02,0.09,2.31
+Dividend,OV8,Sheng Siong Group Ltd,0,0,45.00,Filled,,"Feb 15, 2026 00:00:00 SGT",Dividend,,,,,,SG,SGD,,0,0,45.00,"Feb 15, 2026 00:00:00 SGT",SG,SGD,,,,,,,,,,,0.00
+Dividend,D05,DBS Group Holdings Ltd,0,0,120.00,Filled,,"Mar 1, 2026 00:00:00 SGT",Dividend,,,,,,SG,SGD,,0,0,120.00,"Mar 1, 2026 00:00:00 SGT",SG,SGD,,,,,,,,,,,0.00
