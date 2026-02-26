@@ -1,8 +1,5 @@
 # Grist Stock Tracker - Git Ignore
 
-# Allow sample CSV files (override global .gitignore)
-!samples/*.csv
-
 # Environment files (contain secrets)
 .env
 docker/.env
@@ -44,3 +41,7 @@ Thumbs.db
 
 # Grist specific
 *.grist~  # Grist backup files
+
+
+# no data files 
+.csv
