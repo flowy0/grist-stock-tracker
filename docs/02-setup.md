@@ -268,7 +268,7 @@ INFO - ✅ Created: silver_stocks
 INFO - ✨ Setup complete!
 ```
 
-##### Step 3: Verify Tables Were Created
+##### Step 3: Verify Tables and Formulas Were Created
 
 1. Open Grist at http://localhost:8484
 2. Open your document
@@ -279,10 +279,13 @@ INFO - ✨ Setup complete!
    - `gold_positions`
    - `gold_stocks`
    - `gold_monthly_archive`
+4. Verify formulas were created:
+   - Open `silver_transactions` → check that `Total_Fees` and `Net_Amount` show formula icons (ƒ)
+   - Open `gold_positions` → check that calculated fields have formula icons
 
 ##### Step 4: Configure Table References
 
-The automation script creates tables and formulas, but **table references must be configured manually**:
+The automation script creates tables, columns, and formulas automatically. Only **table references must be configured manually**:
 
 | Column | Should Reference |
 |--------|------------------|
@@ -326,9 +329,11 @@ Follow the detailed guide in `docs/03-grist-table-setup.md` to create tables man
 - `gold_positions` - Position calculations
 - `gold_monthly_archive` - Historical snapshots
 
-**Step 3: Add Formulas**
+**Step 3: Add Formulas (Manual Setup Only)**
 
-After creating tables, add these key formulas:
+> **Note:** If you used the automation script (Option A), formulas are already created. Skip this step.
+
+If creating tables manually, add these key formulas:
 
 **`silver_transactions.Total_Fees`:**
 ```python
