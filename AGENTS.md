@@ -724,6 +724,36 @@ Before considering code complete:
 - [ ] Makes minimal, simple changes (simplicity first)
 - [ ] Documentation is updated if needed
 - [ ] Uses lowercase with prefixes for table names
+- [ ] **New features are tested** - Unit tests added for new functionality
+- [ ] **Tests pass** - Run `uv run pytest` and all tests pass
+- [ ] **Code is testable** - Functions are modular and can be mocked
+
+### Testing Requirements
+
+**All new code must be testable:**
+- Functions should be pure (deterministic output for given input)
+- External dependencies (APIs, databases) should be mockable
+- Avoid global state
+
+**Running tests:**
+```bash
+cd scripts
+uv run pytest tests/ -v
+```
+
+**Before committing:**
+```bash
+# Run all tests
+uv run pytest tests/
+
+# Run with coverage
+uv run pytest --cov=. --cov-report=term-missing
+```
+
+**Test coverage expectations:**
+- Core logic functions: >80% coverage
+- API clients: Mock-based tests
+- Data transformation: Edge case testing
 
 ## External Documentation
 
