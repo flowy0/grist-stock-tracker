@@ -93,6 +93,18 @@ class GristAPI:
         existing_ids = [t.get("id", "").lower() for t in tables]
         return table_id.lower() in existing_ids
 
+    def get_actual_table_id(self, table_id: str) -> str:
+        """Get the actual table ID with correct casing from Grist.
+        
+        Grist may capitalize table IDs (e.g., 'bronze_transactions' -> 'Bronze_transactions')
+        This returns the actual ID used in the document.
+        """
+        tables = self.get_tables()
+        for table in tables:
+            if table.get("id", "").lower() == table_id.lower():
+                return table.get("id")
+        return table_id  # Return original if not found
+
     def get_records(self, table_id: str) -> list:
         """Get records from a table."""
         endpoint = f"docs/{self.doc_id}/tables/{table_id}/records"
@@ -217,7 +229,7 @@ class CSVImporter:
                 logger.info(f"  ... and {len(records) - 3} more")
             return len(records)
 
-        # Check if table exists
+        # Check if table exists and get actual table ID (Grist may capitalize it)
         if not self.grist_api.table_exists("bronze_transactions"):
             logger.error("❌ Table 'bronze_transactions' not found in Grist document")
             logger.error("")
@@ -228,10 +240,14 @@ class CSVImporter:
             logger.error("  uv run python setup_grist_tables.py --env dev --list-tables")
             raise RuntimeError("Required table 'bronze_transactions' does not exist")
 
+        # Get the actual table ID with correct casing
+        actual_table_id = self.grist_api.get_actual_table_id("bronze_transactions")
+        logger.debug(f"Using table ID: {actual_table_id}")
+
         # Insert into Grist
         try:
-            result = self.grist_api.add_records("bronze_transactions", records)
-            logger.info(f"Successfully inserted {len(records)} records into bronze_transactions")
+            result = self.grist_api.add_records(actual_table_id, records)
+            logger.info(f"Successfully inserted {len(records)} records into {actual_table_id}")
             return len(records)
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 404:
