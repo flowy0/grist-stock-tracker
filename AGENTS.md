@@ -95,7 +95,10 @@ grist-stock-tracker/
 │   ├── sample-singapore-stocks.csv # Singapore stocks test data (14 rows)
 │   ├── sample-us-stocks.csv        # US stocks test data (17 rows)
 │   └── sample-mixed-portfolio.csv  # Mixed SG/US portfolio test data (22 rows)
-├── scripts/                    # Python automation scripts
+├── scripts/                    # Python automation scripts & tests
+│   └── tests/                  # Test suite
+│       ├── test_*.py           # Unit tests for scripts
+│       └── ui/                 # UI tests (Playwright)
 ├── templates/                  # Grist templates (.grist files)
 ├── grist-data/                 # Persisted Grist data (created at runtime)
 └── backups/                    # Backup archives (created at runtime)
@@ -756,6 +759,27 @@ uv run pytest --cov=. --cov-report=term-missing
 - Core logic functions: >80% coverage
 - API clients: Mock-based tests
 - Data transformation: Edge case testing
+
+**UI Testing with Playwright:**
+```bash
+# Install browsers (one-time)
+cd scripts && uv run playwright install chromium
+
+# Run UI tests
+uv run pytest tests/ui/ -v -m ui
+
+# Run UI tests headless
+uv run pytest tests/ui/ -v -m ui --headless
+
+# Run all tests except UI
+uv run pytest tests/ -v -m "not ui"
+```
+
+**UI Test Structure:**
+- `tests/ui/conftest.py` - Playwright fixtures and setup
+- `tests/ui/test_grist_ui.py` - Grist UI interaction tests
+- Tests use `@pytest.mark.ui` decorator
+- CI/CD should exclude UI tests with `-m "not ui"`
 
 ## External Documentation
 
