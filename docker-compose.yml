@@ -22,8 +22,6 @@ services:
       - GRIST_TELEMETRY_LEVEL=off
     volumes:
       - ./grist-data:/persist
-      - ./scripts:/persist/scripts:ro
-      - ./templates:/persist/templates:ro
       - ./backups:/persist/backups
     networks:
       - grist-network
