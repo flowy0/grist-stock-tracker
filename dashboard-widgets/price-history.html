@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Price History</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+        #chart-container {
+            width: 100%;
+            height: 400px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #symbol-display {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        .error {
+            color: #d73a49;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="symbol-display">Select a stock to view price history</div>
+    <div id="chart-container">
+        <div class="loading">Loading chart...</div>
+    </div>
+
+    <script>
+        // Grist data mapping
+        let currentSymbol = null;
+        let currentRecord = null;
+
+        // Initialize Grist plugin
+        grist.ready({
+            columns: ['Symbol'],
+            requiredAccess: 'read table'
+        });
+
+        // Listen for record selection
+        grist.onRecord((record, mappings) => {
+            if (!record) return;
+            
+            currentRecord = record;
+            
+            // Get the symbol from the reference column
+            const symbolRef = record.Symbol;
+            
+            // The symbol reference is an object with id
+            // We need to look up the actual symbol value
+            fetchSymbolAndLoadChart(symbolRef);
+        });
+
+        // Alternative: Listen for multiple records (for table view)
+        grist.onRecords((records, mappings) => {
+            if (records && records.length > 0) {
+                // Use the first selected record
+                const record = records[0];
+                currentRecord = record;
+                fetchSymbolAndLoadChart(record.Symbol);
+            }
+        });
+
+        async function fetchSymbolAndLoadChart(symbolRef) {
+            try {
+                // symbolRef could be a number (record ID) or an object
+                let symbolId = null;
+                
+                if (typeof symbolRef === 'number') {
+                    symbolId = symbolRef;
+                } else if (symbolRef && symbolRef.id) {
+                    symbolId = symbolRef.id;
+                } else {
+                    showError('Unable to determine symbol');
+                    return;
+                }
+
+                // Fetch the Silver_stocks table to get the symbol name
+                const tableData = await grist.docApi.fetchTable('Silver_stocks');
+                
+                // Find the stock with matching ID
+                const stock = tableData.records.find(r => r.id === symbolId);
+                
+                if (!stock) {
+                    showError('Stock not found');
+                    return;
+                }
+
+                const symbol = stock.fields.Symbol;
+                currentSymbol = symbol;
+                
+                document.getElementById('symbol-display').textContent = 
+                    `${symbol} - Price History (6 Months)`;
+                
+                // Fetch and display price data
+                await fetchPriceHistory(symbol);
+                
+            } catch (err) {
+                console.error('Error:', err);
+                showError('Failed to load symbol: ' + err.message);
+            }
+        }
+
+        async function fetchPriceHistory(symbol) {
+            const container = document.getElementById('chart-container');
+            container.innerHTML = '<div class="loading">Fetching price data...</div>';
+
+            try {
+                // Map symbol to Yahoo Finance format
+                const yahooSymbol = mapToYahooSymbol(symbol);
+                
+                // Fetch from Yahoo Finance
+                const response = await fetch(
+                    `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=6mo`
+                );
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch price data');
+                }
+                
+                const data = await response.json();
+                
+                if (!data.chart || !data.chart.result || data.chart.result.length === 0) {
+                    throw new Error('No price data available');
+                }
+                
+                const result = data.chart.result[0];
+                const timestamps = result.timestamp.map(t => new Date(t * 1000));
+                const prices = result.indicators.quote[0].close;
+                
+                // Filter out null values
+                const validData = timestamps.map((date, i) => ({
+                    date: date,
+                    price: prices[i]
+                })).filter(d => d.price !== null);
+                
+                renderChart(validData, symbol);
+                
+            } catch (err) {
+                console.error('Error fetching price history:', err);
+                // Show demo data if fetch fails
+                showDemoData(symbol);
+            }
+        }
+
+        function mapToYahooSymbol(symbol) {
+            // Map your symbols to Yahoo Finance format
+            const mapping = {
+                'OV8': 'OV8.SI',
+                'D05': 'D05.SI',
+                'AAPL': 'AAPL',
+                'NVDA': 'NVDA'
+            };
+            return mapping[symbol] || symbol;
+        }
+
+        function renderChart(data, symbol) {
+            const dates = data.map(d => d.date);
+            const prices = data.map(d => d.price);
+            
+            // Calculate min/max for range
+            const minPrice = Math.min(...prices);
+            const maxPrice = Math.max(...prices);
+            const priceRange = maxPrice - minPrice;
+            
+            const trace = {
+                x: dates,
+                y: prices,
+                type: 'scatter',
+                mode: 'lines',
+                name: symbol,
+                line: {
+                    color: '#28a745',
+                    width: 2
+                },
+                fill: 'tozeroy',
+                fillcolor: 'rgba(40, 167, 69, 0.1)'
+            };
+
+            const layout = {
+                margin: { t: 20, r: 50, b: 40, l: 60 },
+                xaxis: {
+                    title: '',
+                    showgrid: false,
+                    zeroline: false
+                },
+                yaxis: {
+                    title: 'Price',
+                    showgrid: true,
+                    gridcolor: '#e0e0e0',
+                    tickformat: '$.2f',
+                    range: [minPrice - priceRange * 0.1, maxPrice + priceRange * 0.1]
+                },
+                paper_bgcolor: 'white',
+                plot_bgcolor: 'white',
+                hovermode: 'x unified',
+                showlegend: false
+            };
+
+            const config = {
+                responsive: true,
+                displayModeBar: false
+            };
+
+            Plotly.newPlot('chart-container', [trace], layout, config);
+        }
+
+        function showDemoData(symbol) {
+            // Generate demo data if API fails
+            const dates = [];
+            const prices = [];
+            const basePrice = 100;
+            const today = new Date();
+            
+            for (let i = 180; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                dates.push(date);
+                
+                // Random walk
+                const randomChange = (Math.random() - 0.5) * 2;
+                prices.push(basePrice + randomChange * 10 + Math.sin(i / 30) * 5);
+            }
+            
+            const data = dates.map((d, i) => ({ date: d, price: prices[i] }));
+            
+            document.getElementById('symbol-display').textContent = 
+                `${symbol} - Price History (Demo Data)`;
+            
+            renderChart(data, symbol);
+        }
+
+        function showError(message) {
+            document.getElementById('chart-container').innerHTML = 
+                `<div class="error">${message}</div>`;
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (document.getElementById('chart-container').data) {
+                Plotly.Plots.resize('chart-container');
+            }
+        });
+    </script>
+</body>
+</html>
