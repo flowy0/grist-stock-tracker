@@ -51,19 +51,19 @@ class Config:
 
         if env == "test":
             return GristConfig(
-                url=os.getenv("TEST_GRIST_URL", "http://localhost:8485"),
+                url=os.getenv("TEST_GRIST_URL", "http://localhost:8485").rstrip('/'),
                 api_key=os.getenv("TEST_GRIST_API_KEY", ""),
                 doc_id=os.getenv("TEST_GRIST_DOC_ID", ""),
             )
         elif env == "production" or env == "prod":
             return GristConfig(
-                url=os.getenv("PROD_GRIST_URL", "http://localhost:8484"),
+                url=os.getenv("PROD_GRIST_URL", "http://localhost:8484").rstrip('/'),
                 api_key=os.getenv("PROD_GRIST_API_KEY", ""),
                 doc_id=os.getenv("PROD_GRIST_DOC_ID", ""),
             )
         else:  # dev (default)
             return GristConfig(
-                url=os.getenv("GRIST_URL", "http://localhost:8484"),
+                url=os.getenv("GRIST_URL", "http://localhost:8484").rstrip('/'),
                 api_key=os.getenv("GRIST_API_KEY", ""),
                 doc_id=os.getenv("GRIST_DOC_ID", ""),
             )
