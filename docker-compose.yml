@@ -4,6 +4,8 @@
 version: '3.8'
 
 services:
+  # Grist - Optional local instance
+  # Use --profile grist to start, or use external Grist instances
   grist:
     image: gristlabs/grist:latest
     container_name: grist-stock-tracker
@@ -25,6 +27,8 @@ services:
       - ./backups:/persist/backups
     networks:
       - grist-network
+    profiles:
+      - grist
 
   postgres:
     image: postgres:15-alpine

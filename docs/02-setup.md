@@ -74,11 +74,31 @@ podman machine list
 podman machine start
 ```
 
-### 4. Start Grist Services
+### 4. Start Grist Services (Optional)
+
+You have two options for Grist:
+
+#### Option A: Use External Grist Instances (Recommended for Network Deployments)
+
+If you have Grist deployed elsewhere (e.g., `grist-test.local.test`, `grist-prod.local.test`), skip this step and configure the URLs in `.env`:
 
 ```bash
-# Start Grist container
-docker compose up -d grist
+# Test environment
+TEST_GRIST_URL=http://grist-test.local.test
+TEST_GRIST_API_KEY=your_key
+TEST_GRIST_DOC_ID=your_doc_id
+
+# Production environment  
+PROD_GRIST_URL=http://grist-prod.local.test
+PROD_GRIST_API_KEY=your_key
+PROD_GRIST_DOC_ID=your_doc_id
+```
+
+#### Option B: Start Local Grist Container
+
+```bash
+# Start local Grist container (only if not using external instances)
+docker compose --profile grist up -d
 
 # Check logs
 docker compose logs -f grist
@@ -88,10 +108,10 @@ Grist will be available at: http://localhost:8484
 
 ### 5. Configure Grist (First Run)
 
-1. Open http://localhost:8484
+1. Open your Grist instance (local or external URL)
 2. Complete initial setup (create admin user)
 3. Create a new document called "Stock Tracker"
-4. **Get your Document ID** from the URL: `http://localhost:8484/o/docs/doc/{DOC-ID}/...`
+4. **Get your Document ID** from the URL: `http://.../o/docs/doc/{DOC-ID}/...`
 5. **Generate API key**: Profile → Settings → API Key → Create Key
 6. **Add to `.env`:**
    ```bash

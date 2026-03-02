@@ -439,23 +439,23 @@ return sum(t.Fill_Amount - (t.Fill_Qty * $Avg_Cost_Basis) for t in txns)
 cp .env.example .env
 # Edit .env with your settings
 
-# 2. Start the application (using podman via docker alias)
-docker compose up -d
+# 2. Start local Grist (optional - skip if using external Grist instances)
+docker compose --profile grist up -d
 
-# 3. Access Grist at http://localhost:8484
+# 3. Access Grist at http://localhost:8484 (or your configured external URL)
 ```
 
 ### Common Operations
 
 ```bash
-# Start with PostgreSQL
-docker compose --profile postgres up -d
+# Start local Grist instance
+docker compose --profile grist up -d
 
-# Start with backup service
-docker compose --profile backup up -d
+# Start with PostgreSQL (optional)
+docker compose --profile grist --profile postgres up -d
 
-# Start all services
-docker compose --profile postgres --profile backup up -d
+# Start with backup service (optional)
+docker compose --profile grist --profile backup up -d
 
 # View logs
 docker compose logs -f grist
@@ -472,7 +472,7 @@ docker compose exec backup backup
 # Restore from backup
 # 1. Stop containers: docker compose down
 # 2. Extract backup to grist-data/
-# 3. Restart: docker compose up -d
+# 3. Restart: docker compose --profile grist up -d
 ```
 
 ### Podman-Specific Notes
@@ -746,8 +746,8 @@ uv run python price_updater.py --env test --doc-id override_doc
 Test environment uses an override file for different port and data directory:
 
 ```bash
-# Start test environment
-docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
+# Start test environment with local Grist
+docker compose --profile grist -f docker-compose.yml -f docker-compose.test.yml up -d
 
 # Or use the management script
 uv run python manage_env.py start test
